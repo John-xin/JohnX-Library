@@ -1,0 +1,107 @@
+C++ program compilation
+
+g++是linux下最常用的编译工具，是GNU的 C++编译器。C++的代码生成过程一般为四个步骤：
+
+    预处理
+    将预处理后文件转换为汇编语言
+    将汇编语言变为目标代码（一般为机器代码）
+    链接，生成可执行程序
+    
+example:
+g++ boost_test.cpp -o boost_test -I /usr/local/include -L /usr/local/lib -l boost_date_time
+
+website reference:
+https://blog.csdn.net/juffson/article/details/78027336?utm_source=blogxgwz0
+
+command line:
+g++ <onefile.cpp> -o <onefile> -I <include/> -L<lib/> -l <libName>
+
+auto compile:
+C_PLUS_InCLUDE_PATH=C_PLUS_InCLUDE_PATH:/otherInclude
+LIBRARY_PATH=LIBRARY_PATH:/otherlib  #static lib
+LD_LIBRARY_PATH=LD_LIBRARY_PATH:/otherlib #share/dynamic lib
+
+add the env var to "/home/.bashrc" file, using "nano .bashrc" command ##### apply only to specific user
+
+nano usage:
+command - save Ctrl+O
+        - quit Ctrl+X
+             
+add to "/etc/profile" ##### apply to all users
+
+共享动态库链接问题：
+——编译时——
+third party lib linking - dir auto check sequence:
+/usr/lib/x86_64-linux-gnu  #this contains *.so files which are created as a link file to the orignial *so.7 file
+
+第三方库链接问题导致不能编译 - 问题原因
+原理： 源代码文件依赖第三方的头文件和库文件（静态库和动态库）
+1. 第三方库正确编译好， make check通过test文件；
+2. 在IDE中第三方头文件目录设置正确， 源代码要引用头文件，；
+3. 库文件目录设置正确，库名设置正确。
+
+问题1： 有多个第三方库版本存在时， 编译器查询目录顺序导致先引用了旧版本或未正确编译的库
+答案1： /usr/lib/x86_64-linux-gnu 下的库文件是源库文件的link文件，被编译器优先查询， 删除这里的库文件， 或用最新编译的库文件替换
+
+
+制作一个共享库文件 libtest.so
+
+gcc -fPIC -o test.o -c test.c
+gcc -shared -Wl,-soname,libtest.so.0 -o libtest.so.0.0.1 test.o
+共享库的real name：libtest.so.0.0.1 （包含主版本号+小版本号+build号）
+-Wl,-soname：给共享库指定一个soname名字 叫做libtest.so.0 （只包含主版本号）
+
+ln -s libtest.so.0.0.0  libtest.so.0
+ln -s libtest.so.0 libtest.so
+生成共享库的链接文件libtest.so->libtest.so.0->libtest.so.0.0.0
+
+gcc -L. -o main main.o -ltest
+最后完成编译，生成可执行文件main
+
+
+——运行时——
+
+用ldd查看运行main所需要的共享库文件：
+ldd main
+    linux-gate.so.1 =>  (0xb76fb000)
+    libtest.so.0 => not found
+    libc.so.6 => /lib/i386-linux-gnu/libc.so.6 (0xb752e000)
+    /lib/ld-linux.so.2 (0xb76fc000)
+得知所需要的共享库文件是以soname方式显示
+
+
+
+---编译链接时，查找顺序 
+/usr/local/lib
+/usr/lib
+用-L指定的路径，按命令行里面的顺序依次查找
+
+---运行加载时的顺序 
+可执行程序指定的的DT_RPATH
+LD_LIBRARY_PATH. 但是如果使用了setuid/setgid，由于安全因素，此路径将被忽略.
+可执行程序指定的的DT_RUNPATH. 但是如果使用了setuid/setgid，由于安全因素，此路径将被忽略
+/etc/ld/so/cache. 如果链接时指定了‘-z nodeflib’，此路径将被忽略.
+/lib. 如果链接时指定了‘-z nodeflib’，此路径将被忽略
+/usr/lib. 如果链接时指定了‘-z nodeflib’，此路径将被忽略
+
+一般通过这几个命令去分析：
+nm 
+查看共享库暴露的接口
+ldconfig 可以自动生成soname的链接接文件。并更新共享库的搜索cache，加速查找。 
+example: ldconfig -p | grep libtest
+readelf 
+可以查看动态库的信息，本身的soname。 
+example: readelf -d libtest.so.0.0.0 | grep soname
+ldd 
+可以查看应用程序或共享库依赖的库 
+example: ldd main
+objdump 与readelf 类似
+ 
+原文：https://blog.csdn.net/lovewubo/article/details/46672233 
+
+
+
+    
+    
+
+

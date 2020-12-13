@@ -1,0 +1,13 @@
+前向声明 - 当两个类相互引用/调用时，需要使用前向声明以避免类的自我引用/调用。
+
+例子：
+类 MKCore 和 VertexMesher
+在MKCore.hpp中，需调用类VertexMesher，通常做法 include VertexMesher.hpp，即可使用VertexMesher;
+在VertexMesher.hpp include MKcore.hpp时，也自动 include 了 VertexMesher.hpp，出现自我引用错误。
+
+解决办法：
+在MKCore.hpp中，声明class VertexMesher，然后可以使用VertexMesher的引用 VertexMesher&， 和 指针 VertexMesher×，
+但不能使用VertexMesher的成员变量和函数。
+
+
+

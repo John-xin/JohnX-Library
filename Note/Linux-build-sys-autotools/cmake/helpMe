@@ -1,0 +1,17 @@
+ensure there is a CMakeLists.txt
+
+cmake .       #执行CMakeLists.txt
+make
+
+change install dir:
+
+cmake -DCMAKE_INSTALL_PREFIX:PATH=/usr 
+
+normal usage:
+cmake <build_dir> <source_dir>
+
+make clean equilavent to:
+rm -r <build_dir>
+
+make check equilavent to :
+make test

@@ -1,0 +1,32 @@
+Q1. Cannot open an executable file, prompting that the shared library cannot be found or existed?
+A: Check the location of the lib installation and the system may not search that library. Add the path to system default 
+checking paths by e.g. "sudo ldconfig /usr/local/lib64". 
+
+Q2. Cmake error because of cannot find an installed software/ cannot link to the shared lib of the software?
+A: add the shared lib path to env variable. 
+e.g. 
+export LD_LIBRARY_PATH="/usr/local/lib64:/usr/local/lib:$LD_LIBRARY_PATH"
+export OPENTHREADS_INC_DIR="/usr/local/include"
+export OPENTHREADS_LIB_DIR="/usr/local/lib64:/usr/local/lib"
+export PATH="$OPENTHREADS_LIB_DIR:$PATH"
+
+Q3. Setup env variable for bin file?
+A: #通过修改.bashrc文件:
+   nano ~/.bashrc 
+   #在最后一行添上：
+   export PATH=/usr/local/bin:$PATH
+   #生效方法：（有以下两种）
+   #1、关闭当前终端窗口，重新打开一个新终端窗口就能生效
+   #2、输入“source ~/.bashrc”命令，立即生效
+   #有效期限：永久有效
+   #用户局限：仅对当前用户
+   
+   #通过修改profile文件:
+   vim /etc/profile
+   export PATH=/usr/local/bin:$PATH
+   #生效方法：5555系统重启55555
+   #有效期限：永久有效
+   #用户局限：对所有用户
+   
+Q4：使用第三方库（非本机编译）时，编译器ABI（Application Binary Interface）不兼容导致异常？
+A: 在本机重新编译； 如第三方库是GCC4编译，本机为GCC5，可以设置-D_GLIBCXX_USE_CXX11_ABI=0

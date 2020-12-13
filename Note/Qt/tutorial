@@ -1,0 +1,81 @@
+Tutorial
+Website: https://wiki.qt.io/Qt_for_Beginners
+
+Qt modules:
+QtCore, a base library that provides containers, thread management, event management, and much more
+QtGui and QtWidgets, a GUI toolkit for Desktop, that provides a lot of graphical components to design applications.
+QtNetwork, that provides a useful set of classes to deal with network communications
+QtWebkit, the webkit engine, that enable the use of web pages and web apps in a Qt application.
+QtSQL, a full featured SQL RDBM abstraction layer extensible with own drivers, support for ODBC, SQLITE, MySQL and PostgreSQL is available out of the box
+QtXML, support for simple XML parsing (SAX) and DOM
+QtXmlPatterns, support for XSLT, XPath, XQuery and Schema validation
+
+
+QtCreator - the IDE for qt project
+
+Project file *.pro - qmake use it to generate makefile for compiler
+
+The following are must included in *.pro:
+TEMPLATE = app
+TARGET = name_of_the_app
+QT = core gui
+greaterThan(QT_MAJOR_VERSION, 4): QT += widgets
+
+explanation:
+TEMPLATE - describes the type to build (application, a library, or simply subdirectories).
+TARGET - the name of the app or the library.
+QT -  indicate what libraries (Qt modules) are being used in this project. (e.g. QtCore and QtGui)
+
+others:
+HEADERS += first_file.h  second_file.h
+SOURCES += first_file.cpp  second_file.cpp
+
+first qt project:
+
+#include <QApplication>
+#include <QPushButton>
+int main(int argc, char **argv)
+{
+ QApplication app (argc, argv);
+ QPushButton button ("Hello world !");
+ button.show();
+ return app.exec();
+}
+
+explanation:
+QApplication - takes care of event loop etc.
+app.exec() - wait for events, like mouse clicks on a GUI
+
+getter/setter to attribute/property:
+for "QPushButton button" - it has
+text
+font
+tooltip
+icon 
+
+usage:
+button.setText("My text");
+button.setToolTip("A tooltip");
+QFont font ("Courier"); //QFont is a class
+button.setFont(font);
+QIcon icon ("/path/to/my/icon/icon.png"); //it is suggested to use relative file path
+button.setIcon(icon);
+
+inheritance - container and view:
+QObject -> QWidget -> QAbstractButton -> QPushButton/QCheckBox
+
+example:
+#include <QApplication>
+#include <QPushButton>
+
+int main(int argc, char **argv)
+{
+ QApplication app (argc, argv);
+ QWidget window; //like a container
+ window.setFixedSize(100, 50);
+ QPushButton *button = new QPushButton("Hello World", &window); // put button into window
+ button->setGeometry(10, 10, 80, 30);
+ window.show(); // due to button is inherited from window, show window would show button
+ return app.exec();
+}
+

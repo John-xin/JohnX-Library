@@ -1,0 +1,26 @@
+EBMesher:
+Elem_Status_Tag: 0 - inside the geometry
+                 1 - outside
+                 2 - on boundary
+                 
+NgTetGenMesher:
+meshkit: output vtk file cannot show interior correctly in paraview
+gmsh: output vtk file show correctly in paraview
+problem: 
+1. tet number prompted by meshkit is different from the tet number shown in paraview
+2. scale is different for gmsh and meshkit in paraview. difference is around 1000 fold.         
+
+PostBLMesher:
+thickness - total height
+interval - number of layers
+bais - [0,1] finer towards boundary; (1,>>) finer towards bulk
+surfaceID/edgeID/NEUMANN - target object for boundary layer
+surface id for 3d mesh; edge id for 2d mesh; NEUMANN for set/group
+
+MOAB:
+background - physics phenomenon -> PDE -> Discretization -> mesh data structure 
+-> PDE solve & data visulization
+4 components - mesh interface instance; 
+  mesh entities (vertex, edge, tri, etc.);
+  sets; group of entities, describing relations between entities 
+  tags. attaching named data to individual entity, set, even whole mesh

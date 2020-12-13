@@ -1,0 +1,33 @@
+software compilation from source
+
+1. dependencies / third party software
+  compiler - gcc / gfortran etc.
+  software - tcl, tk, freetype etc
+
+2. environment var definition
+  check SOFTWARE_DIR, may exit env.sh
+  add source env.sh to ~/.bashrc
+
+3. compilation
+  a-- cmake .
+  b-- ./configure
+  c-- autoconf
+  
+4. install
+  copy lib file, header file, bin file etc to /usr/local/lib
+  
+5. setup ldconf
+  let the bin file (exe file) program know the lib location
+ 
+ 
+example:
+
+  OpenFOAM
+  
+  OpenCascade
+  
+  Qt
+  
+  OpenSceneGraph
+  
+  MeshKit

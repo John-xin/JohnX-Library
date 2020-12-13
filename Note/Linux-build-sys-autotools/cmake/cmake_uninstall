@@ -1,0 +1,9 @@
+By default, CMake does not provide the "make uninstall" target
+
+But
+
+install_manifest.txt file is created when you run make install.
+
+using the command below to remove all files listed in install_manifest.txt 
+
+xargs rm < install_manifest.txt

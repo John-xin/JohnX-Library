@@ -1,0 +1,92 @@
+https://wiki.qt.io/How_to_create_a_library_with_Qt_and_use_it_in_an_application
+
+add third party lib:
+
+QT       += core gui opengl
+
+greaterThan(QT_MAJOR_VERSION, 4): QT += widgets
+
+TARGET = firstQt
+TEMPLATE = app
+
+SOURCES += main.cpp\
+        mainwindow.cpp
+
+CONFIG += c++11
+QMAKE_CXXFLAGS += -std=c++11
+
+HEADERS  += mainwindow.h
+
+FORMS    += mainwindow.ui
+
+
+INCLUDEPATH += /usr/local/include/oce
+
+
+LIBS += -L/usr/local/lib \                              ----- no space between -L and <path>
+-lTKernel -lTKOpenGl -lTKernel \
+-lTKService -lTKV3d -lTKTopAlgo -lTKBRep -lTKPrim \
+-lTKMath -lTKGeomBase -lTKGeomAlgo -lTKG3d -lTKG2d \
+-lTKTopAlgo -lTKMesh -lTKCDF -lTKLCAF -lTKCAF -lTKBO \
+
+
+
+another example:
+QT       += core gui opengl
+
+greaterThan(QT_MAJOR_VERSION, 4): QT += widgets
+
+TARGET = qmesher
+TEMPLATE = app
+
+
+SOURCES += main.cpp\
+        mainwindow.cpp \
+    occview.cpp \
+    geometry.cpp \
+    mesh.cpp
+
+HEADERS  += mainwindow.h \
+    occview.h \
+    geometry.h \
+    mesh.h
+
+FORMS    += mainwindow.ui
+
+# make the curent compiler ABI compatable with the compiler ABI 
+# which compiled the share lib, use -D_GLIBCXX_USE_CXX11_ABI=0
+
+QMAKE_CXXFLAGS += -std=c++11\
+    -D_GLIBCXX_USE_CXX11_ABI=0
+
+
+INCLUDEPATH +=  \
+        /usr/local/include/opencascade \
+
+
+LIBS +=         \
+        -L /usr/local/lib \
+
+LIBS +=         \
+    -lTKernel   \
+    -lTKMath    \
+    -lTKG3d     \
+    -lTKBRep    \
+    -lTKGeomBase\
+    -lTKGeomAlgo\
+    -lTKTopAlgo \
+    -lTKPrim    \
+    -lTKBO      \
+    -lTKBool    \
+    -lTKOffset  \
+    -lTKService \
+    -lTKV3d     \
+    -lTKOpenGl  \
+    -lTKFillet  \
+    -lTKSTEPBase \
+    -lTKSTEP    \
+    -lTKXSBase  \
+
+INCLUDEPATH += /home/johnx//Downloads/gmsh-4.1.4-Linux64-sdk/include
+
+LIBS += -L/home/johnx/Downloads/gmsh-4.1.4-Linux64-sdk/lib/ -lgmsh

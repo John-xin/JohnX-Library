@@ -1,0 +1,23 @@
+
+
+
+Operators # - put a token into a string
+
+#include <iostream>
+using namespace std;
+#define MKSTR( x ) #x
+int main () {
+   cout << MKSTR(HELLO C++) << endl;
+   return 0;
+}
+
+Operators ## - concatenate two tokens
+
+#include <iostream>
+using namespace std;
+#define concat(a, b) a ## b
+int main() {
+   int xy = 100;
+   cout << concat(x, y);
+   return 0;
+}

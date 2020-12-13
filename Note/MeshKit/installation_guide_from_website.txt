@@ -1,0 +1,165 @@
+website: https://bitbucket.org/fathomteam/meshkit/wiki/Install-meshkit-on-Ubuntu-12.04-LTS-64.md
+
+ Wiki
+Clone wiki
+MeshKit / Install-meshkit-on-Ubuntu-12.04-LTS-64
+View History
+Dependents
+
+$ sudo apt-get install tcl8.5 tk8.5 ftgl-dev libfreeimage-dev
+libfreeimage3 libfreetype6-dev libfreetype6
+$ sudo apt-get install openmpi-bin libopenmpi-dev openmpi-common openmpi-checkpoint # openmpi 
+$ sudo apt-get install libparmetis-dev libparmetis3.1 
+$ sudo apt-get install libscotch-5.1 libscotch-dev
+$ sudo apt-get install libptscotch-5.1 libptscotch-dev 
+$ sudo apt-get install netcdf-bin python-netcdf libnetcdf6 libnetcdf-dev 
+$ sudo apt-get install h5utils hdf5-tools libhdf5-openmpi-1.8.4 libhdf5-openmpi-dev
+
+OCC
+
+Here I use OCC 6.6.0. First, patch OCC 6.6.0 with occ_patches_6.6.0 in <CGM_DIR>/geom/OCC/:
+
+$ cd <OCC_DIR>/ros
+$ patch -p0 < <CGM_DIR>/geom/OCC/occ_patches_6.6.0
+
+If yo can't patch it successfully, please open occ_patches_6.6.0 and change revelent OCC files manually.
+
+Then configure it:
+
+export CASROOT="/home/why/software/OCC/660" \
+occFlags="--with-tcl=/usr/lib/tcl8.5" \
+occFlags="$occFlags --with-tk=/usr/lib/tk8.5" \
+occFlags="$occFlags --with-ftgl=/usr/include/FTGL" \
+occFlags="$occFlags --with-freeimage=/usr" \
+occFlags="$occFlags --with-freetype=/usr"  \
+occFlags="$occFlags --with-gl2ps=/home/why/software/gl2ps-1.3.8-source" \
+occFlags="$occFlags --with-tbb-include=/usr/include" \
+occFlags="$occFlags --with-tbb-library=/usr/lib" \
+occFlags="$occFlags --with-qt=/home/why/software/qt" \
+occFlags="$occFlags --enable-draw=yes" \
+occFlags="$occFlags --enable-shared=yes" \
+./configure $occFlags --prefix=$CASROOT
+
+$ make 
+$ make install
+
+cgm
+
+git version: 7a59da17eaa7fc7481981ea85db6e95d821bc5fb # origin/cgm13.1.1
+
+$ autoreconf -fi
+$ ./configure --prefix=/home/why/software/itaps --with-mpi --enable-debug  --with-occ=/home/why/software/OCC/660/Linux
+$ make # or use make -j4 for parallel compile
+$ make check
+$ make install 
+
+Zoltan
+
+For version 3.6:
+
+$ ../configure --prefix=/home/why/software/zoltan --enable-mpi
+--with-mpi=/usr/lib/openmpi --with-libs=-lsuperlu --with-parmetis
+--with-parmetis-incdir=/usr/include/parmetis
+--with-parmetis-libdir=/usr/lib --with-scotch
+--with-scotch-libdir=/usr/lib --with-scotch-incdir=/usr/include/scotch
+$ make
+$ make install
+
+By my test, the version 3.8 of Zoltan can't work well with MOAB.
+MOAB
+
+git version: bd52ba12517416f4b6d2162696a41583b73d52ed
+
+$ ./configure --prefix=/home/why/software/itaps  --enable-debug --enable-igeom \
+--enable-tools --enable-docs --disable-qvdual  --without-cgns \
+--with-mpi \
+--with-netcdf=/usr \
+--with-hdf5 \
+--with-zoltan=/usr \
+--with-parmetis=/usr \
+--with-cgm=/home/why/software/itaps \
+--with-vtk=/home/why/software/vtk \
+--with-vtk-lib-suffix=-6.0
+$ make
+$ make check
+$ make install
+
+LASSO
+
+git version: bbe66e1a1dd988ee1577f2200b31511b50750bbc
+
+$ ./configure --prefix=/home/why/software/itaps --with-mpi --enable-debug  --with-igeom=/home/why/software/itaps --with-imesh=/home/why/software/itaps 
+$ make 
+$ make check
+$ make install
+
+Mesquite
+
+Meshkit use mesquite 2.20:
+
+$ ./configure --prefix=/home/why/software/mesquite/2.20 --with-mpi --with-igeom=/home/why/software/itaps/ IGEOM_DEFS=/home/why/software/itaps/lib/iGeom-Defs.inc --with-imesh=/home/why/software/itaps/ IMESH_DEFS=/home/why/software/itaps/lib/iMesh-Defs.inc --with-irel=/home/why/software/itaps/ IREL_DEFS=/home/why/software/itaps/lib/iRel-Defs.inc
+$ make
+$ make check
+$ make install
+
+Coin-hsl
+
+Dowload Coin MA27 solver from http://www.hsl.rl.ac.uk/download/coinhsl-archive/2011.10.03/, used by Ipopt
+
+$ ./configure --prefix=/home/why/software/coinhsl/2011
+$ make 
+$ make install
+
+Triangle
+
+After dowloading the Triangle, please modify the makefile like this
+
+trilibrary: $(BIN)triangle.o 
+    ar r libtriangle.a triangle.o
+
+$ cd <TRI_DIR>
+$ make trilibrary
+$ mkdir include
+$ cp triangle.h ./include/
+$ mkdir lib
+$ cp libtriangle.a ./lib/
+
+Tetgen
+
+Dowload Tetgen 1.5.0 from http://wias-berlin.de/software/tetgen/. Then you need to change libtet.a to libtetgen.a in Tetgen's makefile.
+
+$ cd <TETGEN_DIR>
+$ make tetlib
+$ $ mkdir include
+$ cp tetgen.h ./include/
+$ mkdir lib
+$ cp libtetgen.a ./lib/
+
+IPopt
+
+Version 3.10.0
+
+./configure --prefix=/home/why/software/Ipopt/3.10.0 --with-blas --with-blas-incdir=/usr/include --with-blas-lib=/usr/lib/libblas --with-hsl-incdir=/home/why/software/coinhsl/2011/include --with-hsl-lib=/home/why/software/coinhsl/2011/lib --with-lapack --with-lapack-incdir=/usr/include --with-lapack-lib=/usr/lib/lapack 
+
+Netgen
+
+sudo ln -sf /usr/lib/libTogl.so /usr/lib/libTogl1.7.so
+
+./configure --prefix=/home/why/software/netgen/4.9.13 --enable-nglib  --enable-jpeglib --enable-ffmpeg --with-tcl=/usr/lib --with-tk=/usr/lib  --with-togl=/usr CPPFLAGS=-I/usr/lib/openmpi/include
+
+MeshKit
+
+git vesion: 4d07ffc4f8497d60fc19632f303259437c6242c0
+
+$ ./configure --prefix=/home/why/software/itaps --with-mpi --enable-debug --enable-html-docs --enable-src --enable-algs  --enable-utils --enable-rgg  --enable-python  --enable-intassign  --with-igeom=/home/why/software/itaps --with-imesh=/home/why/software/itaps --with-irel=/home/why/software/itaps --with-fbigeom=/home/why/software/itaps --with-tetgen=/home/why/software/tetgen/tetgen1.5.0 --with-triangle=/home/why/software/triangle   --with-mesquite=/home/why/software/mesquite/2.20 --with-ipopt=/home/why/software/Ipopt/3.10.0 --with-netgen=/home/why/software/netgen/4.9.13
+$ make
+$ make check
+$ make install
+
+for the current version of MeshKit, a newer version of netgen is needed latest netgen This will download version 5.1 of netgen. It can be built with this minimal configuration
+
+$../configure --prefix=/home/why/software/netgen51 --disable-gui 
+make 
+make install
+
+then configure MeshKit ... --with-netgen=/home/why/software/netgen51...

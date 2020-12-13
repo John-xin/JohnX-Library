@@ -1,0 +1,7 @@
+1970 unix操作系统出现，由美国贝尔实验室的 Ken Thompson 和 Dennis Ritchie 最初使用汇编语言开发
+1973 unix改进， 推出B语言开发的unix
+1973 unix进一步改进，美国贝尔实验室的 Ken Thompson 和 Dennis Ritchie设计出C言语，移植出C语言版的unix
+C语言开始流行，C语言标准出现：C89，C99，C11，C13等
+1983 为防止unix商业化的影响，GNU自由软件基金出现，推出文字编辑器Emacs，C语言编译器GCC等，推出GNU GPL软件开发协议
+1991 出现GNU Linux操作系统，使用C语言开发，GNU的大本营。
+

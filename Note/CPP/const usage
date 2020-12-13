@@ -1,0 +1,10 @@
+1. const int var1;
+   int var2;
+2. const int× ptr=&var1; //pointer to constant var
+3. int* const ptr=&var2; //constant pointer to var
+
+4. within class
+   const int* func(); //return type is const
+   void func(const int* var); //input type is const
+   void func(const int& var); //input type is const
+   void func() const; //func does not modify class member

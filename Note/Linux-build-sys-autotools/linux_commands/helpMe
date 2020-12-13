@@ -1,0 +1,60 @@
+env variable
+    printenv 
+  
+    printenv > file.txt
+    cat file.txt
+
+    printenv | grep <HOME>
+  
+    echo $ENV_NAME
+  
+link
+    为某一个文件，在另外一个位置，建立一个同步的链接，不必重复的占用磁盘空间。
+    ln -s log2013.log link2013
+    -s 软链接(符号链接)
+    log2013.log 源文件
+    link2013 目标文件/生成文件
+    
+
+chmod
+    文件权限：-rwxr--r-- 对应数字版为-744
+    第1个字符：'-'表示为普通文件； 'd'表示为目录； 'l'表示为link文件
+    第234个字符：分别对应，读'r', 写'w',可执行'x', 缺省'-'；作用于本用户'u'；
+    第567个字符：作用于和本用户同组的用户组'g'
+    第8910个字符：作用于其他人'o'
+    chmod a+x log2012.log 
+    'a'：作用于所有用户类 'u,g,o'
+    '+x':增加'x'属性
+    '-w':减去'w'属性
+    '=rwx':等于'rwx'属性
+    
+    chmod ug+w,o-x log2012.log
+    
+    rwx属性对应数字：r=4,w=2,x=1,4+2+1=7
+    chmod 777 log2012.log 相当于chmod a+rwx log2012.log 
+    
+ldconfig
+    在/lib 和 /usr/lib, /etc/ld.so.conf内所列的目录下，搜索 共享的动态链接库（lib*.so*），进而创建出动态装入程序(ld.so) 所需的 连接和缓存文件。
+    缓存文件默认为/etc/ld.so.cache，此文件保存已排好序的 动态链接库 名字列表，为了让动态链接库为系统所共享，需运行ldconfig（该命令文件存放在/sbin）
+    
+    简单说就是 将共享动态库文件罗列出来，供程序运行时进行动态链接。
+    
+    比如安装了一个mysql到/usr/local/mysql，mysql有一大堆library在/usr/local/mysql/lib下面，
+    这时就需要在/etc/ld.so.conf下面加一行/usr/local/mysql/lib，保存过后，ldconfig一下，新的library才能在程序运行时被找到。
+    
+    ###只作用于编译好的程序运行阶段，不作用于程序编译阶段。
+    
+    /etc/ld.so.conf文件中默认有： include /etc/ld.so.conf.d/*.conf
+    表示/etc/ld.so.conf.d/目录下所有的.conf文件都被包含了
+    
+    扫描的目录有：
+    1 /lib 
+    2 /usr/lib
+    3 /etc/ld.so.conf内所列的目录
+    4 /etc/ld.so.conf.d/目录下所有的.conf文件内所列的目录
+    
+    ldconfig -v 查看所扫描的动态链接库文件
+    
+
+dpkg 
+    

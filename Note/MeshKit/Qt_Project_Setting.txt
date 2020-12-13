@@ -1,0 +1,106 @@
+-----pro file setting:
+
+QT       += core gui opengl
+greaterThan(QT_MAJOR_VERSION, 4): QT += widgets
+TARGET = test1
+TEMPLATE = app
+SOURCES += main.cpp
+QMAKE_CXXFLAGS += -std=c++11\
+
+#header files
+INCLUDEPATH += /home/johnx/Software/itaps/cgma-16.0/include \
+INCLUDEPATH += /home/johnx/Software/itaps/cgma-16.0/include/cgm \
+INCLUDEPATH += /home/johnx/Software/itaps/moab-5.1.0/include \
+INCLUDEPATH += /home/johnx/Software/itaps/moab-5.1.0/include/moab \
+INCLUDEPATH += /home/johnx/Software/itaps/meshkit-1.5/include \
+#INCLUDEPATH += /home/johnx/Software/itaps/meshkit-1.5/include/lemon \
+#!!!lemon folder contains math.h which is conflicted with /usr/lib/math.h, 
+#!!!so don't include math.h from lemon
+#INCLUDEPATH += /home/johnx/Software/itaps/meshkit-1.5/include/meshkit \
+
+#static lib files:
+LIBS += \
+/home/johnx/Software/itaps/meshkit-1.5/lib/libMeshKit.a \
+/home/johnx/Software/itaps/moab-5.1.0/lib/libMOAB.a \
+/home/johnx/Software/itaps/cgma-16.0/lib/libiGeom.a \
+/home/johnx/Software/itaps/moab-5.1.0/lib/libFBiGeomMOAB.a \
+/home/johnx/Software/itaps/moab-5.1.0/lib/libiRel.a \
+/home/johnx/Software/itaps/moab-5.1.0/lib/libiMesh.a \
+/home/johnx/Software/itaps/meshkit-1.5/lib/libemon.a \
+/home/johnx/Software/itaps/moab-5.1.0/lib/libmbmsqitaps.a \
+#mbmsqitaps depends on mbmesquite
+/home/johnx/Software/itaps/moab-5.1.0/lib/libmbmesquite.a \
+#mbmesquite must be put below mbmsqitaps
+/home/johnx/Software/itaps/cgma-16.0/lib/libcgm.a \
+
+#!!!the following way to link to static lib is also ok
+#LIBS += \
+#        -L/home/johnx/Software/itaps/meshkit-1.5/lib/ -lMeshKit \
+#        -L/home/johnx/Software/itaps/cgma-16.0/lib/ -liGeom \
+#        -L/home/johnx/Software/itaps/cgma-16.0/lib/ -lcgm \
+#        -L/home/johnx/Software/itaps/moab-5.1.0/lib/ -liMesh \
+#        -L/home/johnx/Software/itaps/moab-5.1.0/lib/ -lMOAB \
+#        -L/home/johnx/Software/itaps/moab-5.1.0/lib/ -liRel \
+#        -L/home/johnx/Software/itaps/moab-5.1.0/lib/ -lFBiGeomMOAB \
+#        -L/home/johnx/Software/itaps/moab-5.1.0/lib/ -lmbmesquite \
+#        -L/home/johnx/Software/itaps/moab-5.1.0/lib/ -lmbmsqitaps \
+#        -L/home/johnx/Software/itaps/meshkit-1.5/lib/ -lemon \
+
+#！！！the following lib must be linked 
+LIBS += -L/lib/x86_64-linux-gnu/ -ldl
+LIBS += -L/usr/lib/x86_64-linux-gnu/hdf5/serial -lhdf5
+LIBS += -L/usr/lib/x86_64-linux-gnu -lnetcdf
+LIBS += -L/usr/lib/ -llapack
+
+
+-----source file:
+#include <QApplication>
+#include "meshkit/MKCore.hpp"
+#include "meshkit/TFIMapping.hpp"
+#include "meshkit/SizingFunction.hpp"
+#include "meshkit/ModelEnt.hpp"
+#include "meshkit/Matrix.hpp"
+#include "meshkit/EdgeMesher.hpp"
+
+const int NUM_INTERVALS = 3; // we want 3 intervals on each side (for no reason)
+const int INTERVAL_SIZE = -1; // in sizing functions, -1 means not specified
+const bool save_mesh = true;
+using namespace MeshKit;
+
+int main(int argc, char **argv)
+{
+
+    MKCore * mk;         // handle for the instance of MeshKit
+    MEntVector curves;   // handle for the curve we need to retrieve, is a vector
+    MEntVector surfaces; // handle for the surface we need to retrieve, is a vector
+    EdgeMesher * em;     // handle for a MeshOp that helps fulfill a pre-req for TFIMapping
+    TFIMapping * tfi;    // handle for our TFIMapping MeshOp
+
+  // Prepare MK
+    mk = new MKCore(); // Start up MK
+    mk->load_geometry("/home/johnx/tmp/meshkit/test1/test1/data/rectangle.stl"); // Load the geometry
+
+  // Prepare EdgeMesher (TFIMapping requires that 1 edge be meshed)
+    mk->get_entities_by_dimension(1, curves); // get all 1D entities and store into "curves"
+    curves.resize(1); // We need to mesh one curve for TFI to suceed
+    em = (EdgeMesher*) mk->construct_meshop("EdgeMesher", curves); // create an EdgeMesher to mesh 1 side
+
+  // Prepare TFIMapping
+    mk->get_entities_by_dimension(2, surfaces); // get all 2D entities and store into "surfaces" (we only have 1)
+    tfi = (TFIMapping*) mk->construct_meshop("TFIMapping", surfaces); // create the TFIMapping MeshOp instance, will operate on the entities stored in surfaces
+    mk->get_graph().addArc(em->get_node(), tfi->get_node()); // TFIMapping depends on EdgeMesher (tfi needs a meshed edge)
+
+  // Specify Sizes
+    SizingFunction sf(mk, NUM_INTERVALS, INTERVAL_SIZE); // create a sizing function
+    surfaces[0]->sizing_function_index(sf.core_index()); // apply the same sizing function to them
+
+  // Execute
+    mk->setup(); // calls setup_this() on all nodes in the graph
+    mk->execute(); // calls execute_this() on all nodes in the graph
+
+  // Save
+    if (save_mesh)
+      mk->save_mesh("tfimapping_out.vtk");
+
+  return 0;
+}

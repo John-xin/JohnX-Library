@@ -1,0 +1,16 @@
+mkdir build
+cd build
+cmake ..
+make
+make install
+
+change options:
+ccmake ..
+
+or:        
+cmake -DCMAKE_PREFIX_PATH=/opt/local ..
+#to specify the location of external packages
+
+cmake -DENABLE_FLTK=0 ..
+
+重新cmake时，需要删除 CMakeCache.txt

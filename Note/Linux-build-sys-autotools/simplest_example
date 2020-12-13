@@ -1,0 +1,34 @@
+using amhello-1.0.tar.gz as an example
+
+~ % tar zxf amhello-1.0.tar.gz
+~ % cd amhello-1.0
+~/amhello-1.0 % ./configure
+…
+config.status: creating Makefile
+config.status: creating src/Makefile
+…
+~/amhello-1.0 % make
+…
+~/amhello-1.0 % make check
+…
+~/amhello-1.0 % su
+Password:
+/home/adl/amhello-1.0 # make install
+…
+/home/adl/amhello-1.0 # exit
+~/amhello-1.0 % make installcheck
+
+Explain:
+
+"configure" creates the "Makefiles". In real-world projects, there may be many more, usually one Makefile per directory.
+
+"make" will construct all the programs, libraries, and scripts for the project package. In our example, this compiles the hello program.
+The constructed files are in the source tree.
+
+"make check" causes the package’s tests to be run. (not mandatory but suggested)
+
+"make install" by default  will install everything in /usr/local, binaries in /usr/local/bin, libraries in /usr/local/lib.
+ 
+That means copying the programs, libraries, header files, scripts, and other data files from the source directory to their final destination on the system.
+
+"installcheck" - Presently most packages do not have any installcheck tests

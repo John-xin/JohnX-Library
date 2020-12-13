@@ -1,0 +1,21 @@
+
+1.
+prerequisite: configure.ac 
+autoconf -> configure
+output is recorded in config.log - Platform, Core tests, Running config.staus, Cache variable, Output variables, confdefs.h
+++++++++++++++++++++++++++++++++
+2.
+prerequisite: Makefile.am
+automake -> Makefile.in
++++++++++++++++++++++++++++++++++
+
+autoheader -> config.h.in
+
+generated files - configure, Makefile.in, Makefile - should not be modified
+                - difficult to read, read configure.ac and Makefile.am instead
+
+1 and 2 can be managed by: autoreconfig
+
+3.
+libtool - designate static/ shared lib
+use *.la, *.lo file

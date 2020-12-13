@@ -1,0 +1,63 @@
+using subclass to create window view
+
+example:
+
++++++ window.h file ++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
+#ifndef WINDOW_H
+#define WINDOW_H
+
+#include <QWidget>
+
+class QPushButton;
+class Window : public QWidget
+{
+ Q_OBJECT //this is a Macro, stating signal and slot setting
+ public:
+  explicit Window(QWidget *parent = 0);
+ private:
+ QPushButton *m_button;
+ 
+ signals:
+ public slots:
+};
+
+#endif // WINDOW_H
++++++ window.h file ++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
+
+
++++++ window.cpp file ++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
+#include "window.h"
+#include <QApplication>
+#include <QPushButton>
+
+Window::Window(QWidget *parent) :
+ QWidget(parent)
+ {
+  // Set size of the window
+  setFixedSize(100, 50);
+
+  // Create and position the button
+  m_button = new QPushButton("Hello World", this);
+  m_button->setGeometry(10, 10, 80, 30);
+
+  // NEW : Do the connection
+  connect(m_button, SIGNAL (clicked()), QApplication::instance(), SLOT (quit())); //Macro - connect signal to a slot
+ }
+ +++++ window.cpp file ++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
+ 
+ 
+ +++++ main.cpp file ++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
+#include <QApplication>
+#include "window.h"
+
+int main(int argc, char **argv)
+{
+ QApplication app (argc, argv);
+
+ Window window;
+ window.show();
+
+ return app.exec();
+}
+ +++++ main.cpp file ++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
+ 

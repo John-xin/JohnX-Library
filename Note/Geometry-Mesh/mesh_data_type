@@ -1,0 +1,74 @@
+class VertexID
+{
+public:
+  int vertexIndex;
+  int normalIndex;
+};
+
+class Face
+{
+public:
+  int nVerts;
+  VertexID* vert;
+};
+
+class Mesh
+{
+ private:
+  int numVerts;
+  int numNormals;
+  int numFaces;
+  Point3* pt;
+  Vector3* norm;
+  Face* face;
+  
+ public:
+  mesh();
+  ~mesh();
+  
+  int readMesh(char* fileName);
+  void drawMesh();
+};
+
+int mesh::readMesh(){
+    fstream infile;
+    infile.open(fileName, ios::in);
+    if(infile.fail()){return -1;}
+    if(infile.eof()){return -1;}
+    infile >> numVerts >> numNormals >> numFaces;
+    pt = new Point3[numVerts];
+    norm = new Vector3[numNormals];
+    face = new Face[numFaces];
+    
+    if(!pt || !norm || !face){return -1};
+    for(int p=0; p<numVerts; p++){
+        infile >> pt[p].x >> pt[p].y >> pt[p].z;
+    }
+    for(n=0; n<numNormals; n++){
+        infile >> norm[n].x >> norm[n].y >> norm[n].z;
+    }
+    for(f=0; f<numFaces; f++){
+        infile >> face[f].nVerts;
+        face[f].vert = new VertexID[face[f].nVerts];
+        for(int i=0; i<face[f].nVerts; i++){
+            infile >> face[f].vert[i].vertexIndex;
+        }
+        for(int i=0; i<face[f].nVerts; i++){
+            infile >> face[f].vert[i].normalIndex;
+        }
+    }
+    return 0;
+}
+
+void mesh::drawMesh(){
+glBegin(GL_POLYGON);
+   for(int f=0; f<numFaces; f++){
+     for(int v=0; v<face[f].nVerts; v++){
+         int vIndex=face[f].vert[v].vertexIndex;
+         int nIndex=face[f].vert[v].normalIndex;
+         glNormal3f(norm[nIndex].x, norm[nIndex].y, norm[nIndex].z);
+         glVertex3f(vert[vIndex].x, vert[vIndex].y, vert[vIndex].z);
+     }
+   }
+ glEnd();
+}

@@ -1,0 +1,22 @@
+1. gcc <Source.cpp> -> bin file
+
+2. gcc <-Wall> <-c> <-I> <-L> <-l> <-o> <Source.cpp> <Output.o> -> obj .o file
+example:
+gcc -L. -lall -o my_program main.c
+
+-Wall : Warning options
+-c : output obj .o file 
+-I : include header file dir
+-L : link to lib file dir
+-l : lib name (remove prefix lib and subfix .so or .a)
+-o : designate output file name
+-fpic : used for make dynamic lib
+
+3. make a static library:
+gcc *.c -c -> get *.o
+ar rcs liball.a *.o -> get a static lib file
+
+4. make a dynamic library:
+gcc *.c -c -fpic -> get *.o
+gcc *o -shared -o liball.so -> get dynamic lib file
+export LD_LIBRARY_PATH=$PWD:$LD_LIBRARY_PATH -> add dynamic lib file dir to env var

@@ -1,0 +1,42 @@
+question1: cannot "configure" CGM due to lack of F77 MPI compiler
+answer: sudo apt-get install gfortran #for Fortran 95 Compiler
+	sudo apt-get install fort77 #for Fortran 97 Compiler
+
+dependency packages:
+$ sudo apt-get install tcl8.5 tk8.5 ftgl-dev libfreeimage-dev libfreeimage3 libfreetype6-dev libfreetype6
+$ sudo apt-get install openmpi-bin libopenmpi-dev openmpi-common openmpi-checkpoint # openmpi 
+$ sudo apt-get install libparmetis-dev libparmetis3.1 
+$ sudo apt-get install libscotch-5.1 libscotch-dev
+$ sudo apt-get install libptscotch-5.1 libptscotch-dev 
+$ sudo apt-get install netcdf-bin python-netcdf libnetcdf6 libnetcdf-dev 
+$ sudo apt-get install h5utils hdf5-tools libhdf5-openmpi-1.8.4 libhdf5-openmpi-dev
+
+build cgma - way 1: without OCC
+0. cd cgma folder
+1. autoreconfig -fi
+2. ./configure --prefix=?? 
+
+build cgma 16.0 - way 2: with OCE 0.17.1 
+prerequisite: build OCE 0.17.1 completely 
+download from - https://github.com/tpaviot/oce/releases/tag/OCE-0.17.1
+0. cd cgma folder
+1. autoreconfig -fi
+2. ./configure --prefix=?? --with-occ=OCE-Install-path
+Resource: https://bitbucket.org/fathomteam/cgm/overview
+	
+build moab 5.1.0
+0. cd moab folder
+1. autoreconfig -fi
+2. ./configure --prefix=?? --enable-irel --enable-fbigeom --enable-mesquite 
+--with-cgm=?? --with-hdf5=?? --with-netcdf=??
+3. --with-hdf5=/usr/lib/x86_64-linux-gnu/hdf5/serial
+--with-netcdf=/usr/lib/x86_64-linux-gnu
+
+build meshkit 1.5
+0. cd meshkit folder
+1. autoreconfig -fi
+2. ./configure --prefix=?? --with-igeom=?? --with-imesh=?? --enable-tools
+3. igeom=cgma_install_path  imesh=moab_install_path
+
+
+

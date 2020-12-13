@@ -1,0 +1,5 @@
+software
+  packages - folders
+    files - source files, header files
+      header - abstract funcs, vars, classes - prototype/interfaces
+      source - interfaces implementation ()

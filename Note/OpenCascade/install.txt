@@ -1,0 +1,8 @@
+
+
+version:
+
+OCE   - Release Date - OCC Version
+0.17.1 - January 2016 - 6.8.0
+
+website: https://github.com/tpaviot/oce/

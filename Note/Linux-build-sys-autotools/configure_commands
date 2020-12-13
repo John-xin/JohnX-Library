@@ -1,0 +1,2 @@
+1 ./configure --help
+2 ./configure --prefix <dir> : e.g. "./configure --prefix ~/usr"

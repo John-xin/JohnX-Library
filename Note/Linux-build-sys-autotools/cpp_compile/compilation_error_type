@@ -1,0 +1,5 @@
+Compilation Error Introduction:
+1. warning - implicit declaration of a function
+    means that function arguments and function return type are assumed as integer type by the compiler
+2. error - undefined reference to "a function"
+    means that no function definition is found by compiler
