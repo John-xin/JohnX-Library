@@ -1,0 +1,120 @@
+rcd D:\johnx\PoLam\CFD\Sim\Case\case_NNE.cas y
+/surface/point-surface pt_0 824.52 841.88 116.7
+/surface/point-surface pt_1 840.11 840.94 116.7
+/surface/point-surface pt_2 824.52 841.88 139.1
+/surface/point-surface pt_3 840.11 840.94 139.1
+/surface/point-surface pt_4 824.52 841.88 164.3
+/surface/point-surface pt_5 840.11 840.94 164.3
+/surface/point-surface pt_6 870.41 840.52 113.9
+/surface/point-surface pt_7 886.01 841.8 113.9
+/surface/point-surface pt_8 870.41 840.52 136.3
+/surface/point-surface pt_9 886.01 841.8 136.3
+/surface/point-surface pt_10 870.41 840.52 161.5
+/surface/point-surface pt_11 886.01 841.8 161.5
+/file/export ascii ptsResult_NNE.dat (pt_0 pt_1 pt_2 pt_3 pt_4 pt_5 pt_6 pt_7 pt_8 pt_9 pt_10 pt_11 ) no pressure q yes y
+
+rcd D:\johnx\PoLam\CFD\Sim\Case\case_NE.cas y
+/surface/point-surface pt_0 824.52 841.88 116.7
+/surface/point-surface pt_1 840.11 840.94 116.7
+/surface/point-surface pt_2 824.52 841.88 139.1
+/surface/point-surface pt_3 840.11 840.94 139.1
+/surface/point-surface pt_4 824.52 841.88 164.3
+/surface/point-surface pt_5 840.11 840.94 164.3
+/surface/point-surface pt_6 870.41 840.52 113.9
+/surface/point-surface pt_7 886.01 841.8 113.9
+/surface/point-surface pt_8 870.41 840.52 136.3
+/surface/point-surface pt_9 886.01 841.8 136.3
+/surface/point-surface pt_10 870.41 840.52 161.5
+/surface/point-surface pt_11 886.01 841.8 161.5
+/file/export ascii ptsResult_NE.dat (pt_0 pt_1 pt_2 pt_3 pt_4 pt_5 pt_6 pt_7 pt_8 pt_9 pt_10 pt_11 ) no pressure q yes y
+
+rcd D:\johnx\PoLam\CFD\Sim\Case\case_ENE.cas y
+/surface/point-surface pt_0 824.52 841.88 116.7
+/surface/point-surface pt_1 840.11 840.94 116.7
+/surface/point-surface pt_2 824.52 841.88 139.1
+/surface/point-surface pt_3 840.11 840.94 139.1
+/surface/point-surface pt_4 824.52 841.88 164.3
+/surface/point-surface pt_5 840.11 840.94 164.3
+/surface/point-surface pt_6 870.41 840.52 113.9
+/surface/point-surface pt_7 886.01 841.8 113.9
+/surface/point-surface pt_8 870.41 840.52 136.3
+/surface/point-surface pt_9 886.01 841.8 136.3
+/surface/point-surface pt_10 870.41 840.52 161.5
+/surface/point-surface pt_11 886.01 841.8 161.5
+/file/export ascii ptsResult_ENE.dat (pt_0 pt_1 pt_2 pt_3 pt_4 pt_5 pt_6 pt_7 pt_8 pt_9 pt_10 pt_11 ) no pressure q yes y
+
+rcd D:\johnx\PoLam\CFD\Sim\Case\case_E.cas y
+/surface/point-surface pt_0 824.52 841.88 116.7
+/surface/point-surface pt_1 840.11 840.94 116.7
+/surface/point-surface pt_2 824.52 841.88 139.1
+/surface/point-surface pt_3 840.11 840.94 139.1
+/surface/point-surface pt_4 824.52 841.88 164.3
+/surface/point-surface pt_5 840.11 840.94 164.3
+/surface/point-surface pt_6 870.41 840.52 113.9
+/surface/point-surface pt_7 886.01 841.8 113.9
+/surface/point-surface pt_8 870.41 840.52 136.3
+/surface/point-surface pt_9 886.01 841.8 136.3
+/surface/point-surface pt_10 870.41 840.52 161.5
+/surface/point-surface pt_11 886.01 841.8 161.5
+/file/export ascii ptsResult_E.dat (pt_0 pt_1 pt_2 pt_3 pt_4 pt_5 pt_6 pt_7 pt_8 pt_9 pt_10 pt_11 ) no pressure q yes y
+
+rcd D:\johnx\PoLam\CFD\Sim\Case\case_ESE.cas y
+/surface/point-surface pt_0 824.52 841.88 116.7
+/surface/point-surface pt_1 840.11 840.94 116.7
+/surface/point-surface pt_2 824.52 841.88 139.1
+/surface/point-surface pt_3 840.11 840.94 139.1
+/surface/point-surface pt_4 824.52 841.88 164.3
+/surface/point-surface pt_5 840.11 840.94 164.3
+/surface/point-surface pt_6 870.41 840.52 113.9
+/surface/point-surface pt_7 886.01 841.8 113.9
+/surface/point-surface pt_8 870.41 840.52 136.3
+/surface/point-surface pt_9 886.01 841.8 136.3
+/surface/point-surface pt_10 870.41 840.52 161.5
+/surface/point-surface pt_11 886.01 841.8 161.5
+/file/export ascii ptsResult_ESE.dat (pt_0 pt_1 pt_2 pt_3 pt_4 pt_5 pt_6 pt_7 pt_8 pt_9 pt_10 pt_11 ) no pressure q yes y
+
+rcd D:\johnx\PoLam\CFD\Sim\Case\case_SSE.cas y
+/surface/point-surface pt_0 824.52 841.88 116.7
+/surface/point-surface pt_1 840.11 840.94 116.7
+/surface/point-surface pt_2 824.52 841.88 139.1
+/surface/point-surface pt_3 840.11 840.94 139.1
+/surface/point-surface pt_4 824.52 841.88 164.3
+/surface/point-surface pt_5 840.11 840.94 164.3
+/surface/point-surface pt_6 870.41 840.52 113.9
+/surface/point-surface pt_7 886.01 841.8 113.9
+/surface/point-surface pt_8 870.41 840.52 136.3
+/surface/point-surface pt_9 886.01 841.8 136.3
+/surface/point-surface pt_10 870.41 840.52 161.5
+/surface/point-surface pt_11 886.01 841.8 161.5
+/file/export ascii ptsResult_SSE.dat (pt_0 pt_1 pt_2 pt_3 pt_4 pt_5 pt_6 pt_7 pt_8 pt_9 pt_10 pt_11 ) no pressure q yes y
+
+rcd D:\johnx\PoLam\CFD\Sim\Case\case_SSW.cas y
+/surface/point-surface pt_0 824.52 841.88 116.7
+/surface/point-surface pt_1 840.11 840.94 116.7
+/surface/point-surface pt_2 824.52 841.88 139.1
+/surface/point-surface pt_3 840.11 840.94 139.1
+/surface/point-surface pt_4 824.52 841.88 164.3
+/surface/point-surface pt_5 840.11 840.94 164.3
+/surface/point-surface pt_6 870.41 840.52 113.9
+/surface/point-surface pt_7 886.01 841.8 113.9
+/surface/point-surface pt_8 870.41 840.52 136.3
+/surface/point-surface pt_9 886.01 841.8 136.3
+/surface/point-surface pt_10 870.41 840.52 161.5
+/surface/point-surface pt_11 886.01 841.8 161.5
+/file/export ascii ptsResult_SSW.dat (pt_0 pt_1 pt_2 pt_3 pt_4 pt_5 pt_6 pt_7 pt_8 pt_9 pt_10 pt_11 ) no pressure q yes y
+
+rcd D:\johnx\PoLam\CFD\Sim\Case\case_SW.cas y
+/surface/point-surface pt_0 824.52 841.88 116.7
+/surface/point-surface pt_1 840.11 840.94 116.7
+/surface/point-surface pt_2 824.52 841.88 139.1
+/surface/point-surface pt_3 840.11 840.94 139.1
+/surface/point-surface pt_4 824.52 841.88 164.3
+/surface/point-surface pt_5 840.11 840.94 164.3
+/surface/point-surface pt_6 870.41 840.52 113.9
+/surface/point-surface pt_7 886.01 841.8 113.9
+/surface/point-surface pt_8 870.41 840.52 136.3
+/surface/point-surface pt_9 886.01 841.8 136.3
+/surface/point-surface pt_10 870.41 840.52 161.5
+/surface/point-surface pt_11 886.01 841.8 161.5
+/file/export ascii ptsResult_SW.dat (pt_0 pt_1 pt_2 pt_3 pt_4 pt_5 pt_6 pt_7 pt_8 pt_9 pt_10 pt_11 ) no pressure q yes y
+

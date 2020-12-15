@@ -1,0 +1,11 @@
+
+/define/boundary-conditions/zone-type interface_inner interface
+/define/boundary-conditions/zone-type interface_outer interface
+/define/mesh-interfaces/create inf_1 (interface_inner) (interface_outer) no no no yes no
+
+
+no
+no
+no 
+yes - matching
+no

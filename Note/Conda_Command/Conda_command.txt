@@ -1,0 +1,14 @@
+<conda list> - list package installed
+<conda search packageName> - to check if the package is installed
+<conda install packageName> - to install a package
+<conda update packageName> <conda update python> <conda update conda>
+<conda remove packageName>
+
+
+To install a non-conda package:
+1. Activate the environment where you want to put the program:
+	<activate myenv>
+2. To use pip to install a program such as "See":
+	<pip install see>
+3. To verify the package was installed:
+	<conda list>

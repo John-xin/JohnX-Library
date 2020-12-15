@@ -1,0 +1,24 @@
+Option Explicit
+'Script written by <insert name>
+'Script copyrighted by <insert company name>
+'Script version Thursday, December 03, 2015 3:22:41 PM
+
+Call Main()
+Sub Main()
+	Dim My_File, Layers, Layer, Path,objStream,objFSO
+	
+	Layers = rhino.LayerNames
+	'My_File = Rhino.SaveFileName("Save", "Text Files (*.dat)|*.dat||")
+	Path = Rhino.DocumentPath
+	Set objFSO = CreateObject("Scripting.FileSystemObject")
+	Set objStream = objFSO.CreateTextFile(Path & "\My_Layer.txt", True)
+	
+	If Not IsNull(My_File) Then 
+		For Each Layer In Layers
+			Call Rhino.PrintEx(Layer)
+			objStream.WriteLine Ucase(Layer)
+		Next
+		objStream.Close
+	End If
+
+End Sub

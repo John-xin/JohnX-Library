@@ -1,0 +1,8 @@
+rc D:\Johnx\Project\R_and_D\Fluent\case_N.cas y
+it 800
+wd D:\Johnx\Project\R_and_D\Fluent\case_N.dat y
+
+rc D:\Johnx\Project\R_and_D\Fluent\case_SW.cas y
+it 800
+wd D:\Johnx\Project\R_and_D\Fluent\case_SW.dat y
+

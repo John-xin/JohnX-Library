@@ -1,0 +1,138 @@
+'Within this file several subroutines have been written that allow to annotate points
+'using 2 methods - annotation dots or annotation text. The other subroutines allow to export
+'the annotated points to Ensight'
+
+Call xport_dot_points
+Dim objFSO
+Dim objStream1
+Dim count
+Dim arrPoints, arrPoint, strPoint
+
+Sub xport_dot_points
+	count = 1
+	Rhino.UnselectAllObjects
+	arrPoints = Rhino.GetObjects("pick points", 1)
+	' Create a file system object
+	Set objFSO = CreateObject("Scripting.FileSystemObject")
+	path = Rhino.DocumentPath
+	strFileName = Rhino.SaveFileName("Save", "Text Files (*.cmd)|*.cmd||")
+	If Not IsNull(strFileName) Then
+		Set objStream1 = objFSO.CreateTextFile(strFileName, True)
+		Set objwrite = objFSO.CreateTextFile("PickOrder.txt", True)
+		pass = 1
+	End If
+
+	'Loop through selected points in the same order as selected previously
+	'annotate the point using Rhino.Dots and write them to a text file    
+	If Not IsNull(arrPoints) Then
+		'Write Ensight query file'
+		For Each arrPoint In arrPoints
+			count = count + 1
+		Next
+		If Not IsNull(strFileName) Then 
+			Call EnsightHeader
+			objStream1.WriteLine "query_interact: #_displayed " & count - 1
+		End If
+		count = 1
+		strText = Rhino.StringBox("Enter an annotation prior to the number:", "Point")
+		For Each arrPoint In arrPoints
+			objwrite.WriteLine(arrPoint)           
+			textString = strText & count
+			strPoint = Rhino.PointCoordinates(arrPoint)
+			Rhino.AddTextDot(textString), strPoint
+			If Not IsNull(strFileName) Then 
+				objStream1.WriteLine "query_interact: create " & Round(strPoint(0), 2) & " " & Round(strPoint(1), 2) & " " & Round(strPoint(2), 2)
+			End If
+			count = count + 1
+		Next
+	End If
+
+	If Not IsNull(strFileName) Then 
+		objStream1.WriteLine "query_interact: save " & strFileName & Rhino.CurrentLayer & ".dat"
+		objStream1.Close
+	End If
+End Sub
+
+
+Sub xport_text_points
+	count = 1
+	Rhino.UnselectAllObjects
+	arrPoints = Rhino.GetObjects("pick points", 1)
+	' Create a file system object
+	Set objFSO = CreateObject("Scripting.FileSystemObject")
+	path = Rhino.DocumentPath
+	strFileName = Rhino.SaveFileName("Save", "Text Files (*.cmd)|*.cmd||")
+	Set objStream1 = objFSO.CreateTextFile(strFileName, True)
+    
+	'Loop through selected points in the same order as selected previously
+	'annotate the point using Rhino.Text and write them to a text file
+	If Not IsNull(arrPoints) Then
+		'Write Ensight query file'
+		For Each arrPoint In arrPoints
+			count = count + 1
+		Next
+		count = 1
+		strText = Rhino.StringBox("Enter an annotation prior to the number:", "Point")
+		textheight = Rhino.RealBox("What is the text size you would like to assigne?", 5.0)
+		For Each arrPoint In arrPoints
+			textString = strText & count
+			strPoint = Rhino.PointCoordinates(arrPoint)
+			'assign point text and size'
+			bool = Rhino.AddText(textString, strPoint, textheight)
+			objStream1.WriteLine "query_interact: create " & Round(strPoint(0), 2) & " " & Round(strPoint(1), 2) & " " & Round(strPoint(2), 2)
+			count = count + 1
+		Next
+	End If
+	objStream1.WriteLine "query_interact: save " & strFileName & Rhino.CurrentLayer & ".dat"
+	objStream1.Close
+
+End Sub
+
+Sub EnsightHeader
+	objStream1.WriteLine "VERSION 8.21"
+	objStream1.WriteLine " "
+	objStream1.WriteLine "variables: activate CV01"
+	objStream1.WriteLine "query_interact: select_varname_begin"
+	objStream1.WriteLine "CV01"
+	objStream1.WriteLine "query_interact: select_varname_end"
+	objStream1.WriteLine "part: select_begin"
+	objStream1.WriteLine "1"
+	objStream1.WriteLine "part: select_end"
+	objStream1.WriteLine "query_interact: query xyz"
+End Sub
+
+
+Sub xport_annot_points
+	count = 1
+	Rhino.UnselectAllObjects
+	arrPoints = ObjectsByType(8192)
+	' Create a file system object
+	Set objFSO = CreateObject("Scripting.FileSystemObject")
+	path = Rhino.DocumentPath
+	strFileName = Rhino.SaveFileName("Save", "Text Files (*.cmd)|*.cmd||")
+	Set objStream1 = objFSO.CreateTextFile(strFileName, True)
+    
+
+	'Loop through selected points in the same order as selected previously
+	'annotate the point using Rhino.Dots and write them to a text file    
+	If Not IsNull(arrPoints) Then
+		'Write Ensight query file'
+		For Each arrPoint In arrPoints
+			count = count + 1
+		Next
+		Call EnsightHeader
+		objStream1.WriteLine "query_interact: #_displayed " & count - 1
+		count = 1
+		For Each arrPoint In arrPoints
+			'textString = strText & count
+			strPoint = Rhino.PointCoordinates(arrPoint)
+			'Rhino.AddTextDot (textString), strPoint
+			objStream1.WriteLine "query_interact: create " & Round(strPoint(0), 2) & " " & Round(strPoint(1), 2) & " " & Round(strPoint(2), 2)
+			count = count + 1
+		Next
+	End If
+
+	objStream1.WriteLine "query_interact: save " & strFileName & Rhino.CurrentLayer & ".dat"
+	objStream1.Close
+
+End Sub

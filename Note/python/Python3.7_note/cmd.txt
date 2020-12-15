@@ -1,0 +1,4 @@
+check installed package:
+pip list - for pip 
+conda list - for anaconda
+help("modules") - cmd within python

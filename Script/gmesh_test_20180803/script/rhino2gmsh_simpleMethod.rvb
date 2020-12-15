@@ -1,0 +1,16 @@
+Option Explicit
+'Script written by <insert name>
+'Script copyrighted by <insert company name>
+'Script version Saturday, July 14, 2018 13:02:25
+
+Call Main()
+Sub Main()
+
+End Sub
+
+
+Sub boundingBox()
+	Dim minX, minY, minZ, maxX, maxY, maxZ as double
+	
+	return minX, minY, minZ, maxX, maxY, maxZ
+End Sub

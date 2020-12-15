@@ -1,0 +1,1003 @@
+﻿Option Explicit
+'Script last updated: 29/1/2010
+'Script update - calcArea for daylight workplane - bug removed - 30/05/2018
+'Script update - calcArea for solar irradiation workplane - bug removed - 04/06/2018
+
+rhino.print VbCrLf & "Start Processing..."
+Call SelectChoice
+rhino.print "Finished!"
+
+Sub SelectChoice
+	Dim strPath, strRadPath, strResult
+	Dim arrResults, arrChoices(25), arrDefault(25), arrList(5)
+	Dim i
+
+	strPath = Rhino.DocumentPath
+	If Not IsNull(strPath) Then
+		strRadPath = Rhino.BrowseForFolder(strPath, "Select Radiance folder ")
+	Else
+		strRadPath = Rhino.BrowseForFolder(, "Select Radiance folder ")
+	End If
+
+	If Not IsNull(strRadPath) Then
+		arrList(0) = "Daylighting"
+		arrList(1) = "Glare"
+		arrList(2) = "Daylight (Working Plane)"
+		arrList(3) = "Solar Irradiation (Working Plane)"
+		arrList(4) = "LEED 75% daylight: Export Plane"
+		arrList(5) = "LEED 90% view: Export Plane"
+	  
+		strResult = Rhino.ListBox(arrList, "Choose...")
+    
+		arrChoices(0) = "model.rif"
+		arrChoices(1) = "sky.rad"
+		arrChoices(2) = "materials.mat"
+		arrChoices(3) = "Objects (*.obj)"
+		arrChoices(4) = "ObjtoRad.bat"
+		arrChoices(5) = "view.vf"
+		arrChoices(6) = "run.bat"
+		arrChoices(7) = "ExportTiff.bat"
+		arrChoices(8) = "ExportHuman.bat"
+		arrChoices(9) = "ObjtoVTK_pts.bat"
+		arrChoices(10) = "Run_WPlane.bat"
+		arrChoices(11) = "MergeResult.bat"
+		arrChoices(12) = "VTKToTec.bat"
+		arrChoices(13) = "ChangeNormal.bat"
+		arrChoices(14) = "CalcArea.bat"
+		arrChoices(15) = "CombineOutput.bat"
+		arrChoices(16) = "Glare.bat"
+		arrChoices(17) = "changeNormals.pl"
+		arrChoices(18) = "combinefile.pl"
+		arrChoices(19) = "CreateShadows.pl"
+		arrChoices(20) = "makeSkies.pl"
+		arrChoices(21) = "mergefile.pl"
+		arrChoices(22) = "vtk2result.pl"
+		arrChoices(23) = "makeRadplane.pl"
+		arrChoices(24) = "vtk2tecplot.pl"
+		arrChoices(25) = "objchecker.pl"
+    
+		For i = 0 To UBound(arrDefault)
+			arrDefault(i) = False
+		Next
+		
+		'Assigning default values for each option
+		Select Case strResult
+			Case "Daylighting"
+				arrDefault(0) = True
+				arrDefault(1) = True
+				arrDefault(2) = True
+				arrDefault(3) = True
+				arrDefault(4) = True
+				arrDefault(5) = True
+				arrDefault(6) = True
+				arrDefault(7) = True
+				arrDefault(8) = True
+				arrDefault(19) = True
+				arrDefault(25) = True
+			Case "Daylight (Working Plane)"
+				arrDefault(0) = True
+				arrDefault(1) = True
+				arrDefault(2) = True
+				arrDefault(3) = True
+				arrDefault(4) = True
+				arrDefault(9) = True
+				arrDefault(10) = True
+				arrDefault(11) = True
+				arrDefault(12) = True
+				arrDefault(13) = True
+				arrDefault(14) = True
+				arrDefault(15) = True
+				arrDefault(17) = True
+				arrDefault(18) = True
+				arrDefault(19) = True
+				arrDefault(21) = True
+				arrDefault(22) = True
+				arrDefault(23) = True
+				arrDefault(24) = True
+				arrDefault(25) = True
+			Case "Solar Irradiation (Working Plane)"
+				arrDefault(0) = True
+				arrDefault(1) = True
+				arrDefault(2) = True
+				arrDefault(3) = True
+				arrDefault(4) = True
+				arrDefault(9) = True
+				arrDefault(10) = True
+				arrDefault(11) = True
+				arrDefault(12) = True
+				arrDefault(13) = True
+				arrDefault(14) = True
+				arrDefault(15) = True
+				arrDefault(17) = True
+				arrDefault(18) = True
+				arrDefault(20) = True
+				arrDefault(21) = True
+				arrDefault(22) = True
+				arrDefault(23) = True
+				arrDefault(24) = True
+				arrDefault(25) = True
+			Case "LEED 75% daylight: Export Plane"
+				arrDefault(0) = True
+				arrDefault(1) = True
+				arrDefault(2) = True
+				arrDefault(3) = True
+				arrDefault(4) = True
+				arrDefault(9) = True
+				arrDefault(10) = True
+				arrDefault(11) = True
+				arrDefault(12) = True
+				arrDefault(13) = True
+				arrDefault(14) = True
+				arrDefault(15) = True
+				arrDefault(17) = True
+				arrDefault(18) = True
+				arrDefault(21) = True
+				arrDefault(22) = True
+				arrDefault(23) = True
+				arrDefault(24) = True
+				arrDefault(25) = True
+			Case "LEED 90% view: Export Plane"
+				arrDefault(0) = True
+				arrDefault(1) = True
+				arrDefault(2) = True
+				arrDefault(3) = True
+				arrDefault(4) = True
+				arrDefault(9) = True
+				arrDefault(10) = True
+				arrDefault(11) = True
+				arrDefault(12) = True
+				arrDefault(13) = True
+				arrDefault(14) = True
+				arrDefault(15) = True
+				arrDefault(17) = True
+				arrDefault(18) = True
+				arrDefault(21) = True
+				arrDefault(22) = True
+				arrDefault(23) = True
+				arrDefault(24) = True
+				arrDefault(25) = True
+			Case "Glare"
+				arrDefault(0) = True
+				arrDefault(1) = True
+				arrDefault(2) = True
+				arrDefault(3) = True
+				arrDefault(4) = True
+				arrDefault(5) = True
+				arrDefault(6) = True
+				arrDefault(7) = True
+				arrDefault(8) = True
+				arrDefault(16) = True
+				arrDefault(19) = True
+				arrDefault(25) = True
+		End Select
+
+		arrResults = Rhino.CheckListBox(arrChoices, arrDefault, "Files to be exported:", "Export...")
+		If Not IsNull(arrResults) Then
+			Call main(strRadPath, arrChoices, arrResults, strResult)
+		End If
+	End If
+End Sub
+
+
+Sub main(strRadPath, arrChoices, arrResults, strResult)
+	Dim temp
+	Dim strRunPath, strViewPath, strSkyPath, strModelFile, strGlareFile
+	Dim strTiffPath, strHumanPath
+	Dim dblMaxLength, dblMinLength, dblThreshold
+	Dim strRunLine, strSkyType, strRenderPara, strWPlane_eq
+	Dim boolWPlane
+	Dim arrLayerName, strLayerName
+	Dim strOutfile
+	Dim arrFileName(25), arrBoolEachLayer(25), arrObjects
+	Dim i
+	Dim objFSO, objStream
+	Dim arrLayerChoice(), arrLayerResults, arrWPlaneResults, arrLayerDefault()
+	Dim boolFound
+  
+	For i = 0 To UBound(arrChoices)
+		arrFileName(i) = strRadPath & arrChoices(i)
+	Next
+	
+	'Specify settings for each option
+	Select Case strResult
+		Case "Daylighting"
+			dblMaxLength = 100
+			dblMinLength = 0.01
+			strSkyType = "9 22 12:0 -c"
+			If arrResults(0) Then
+				temp = Rhino.MessageBox("Illuminance Mode?", 4)
+				If temp = 6 Then
+					strRenderPara = "render= -st .001 -dj .02 -i -aa 0.1"
+				Else
+					strRenderPara = "render= -st .001 -dj .02 -aa 0.1"
+				End If
+			End If
+			strRunLine = "rad -v view ./model.rif REP=1"
+  	  
+		Case "Daylight (Working Plane)"
+			dblMaxLength = 5
+			dblMinLength = 0.01
+			strSkyType = "9 22 12:0 +s"
+			strRenderPara = "render= -st .001 -dj .02 -i -aa 0.05 -av 0 0 0"
+			strWPlane_eq = chr(34) & "$1=($1*47.4482686+$2*119.950519+$3*11.6012125)" & chr(34)
+			boolWPlane = True
+		
+		Case "Solar Irradiation (Working Plane)"
+			dblMaxLength = 5
+			dblMinLength = 0.01
+			strSkyType = "9 22 12:0 +s"
+			strRenderPara = "render= -st .001 -dj .02 -i -aa 0.05 -av 0 0 0"
+			strWPlane_eq = chr(34) & "$1 = ($1 * 47.4482686 + $2 * 119.950519 + $3 * 11.6012125) / 179.0" & chr(34)
+			boolWPlane = True
+		
+		Case "LEED 75% daylight: Export Plane"
+			dblMaxLength = 0.5
+			dblMinLength = 0.01
+			strSkyType = "9 22 12:0 +s"
+			strRenderPara = "render= -st .001 -dj .02 -i -aa 0.05 -av 0 0 0"
+			strWPlane_eq = chr(34) & "$1 = 1 * 47.4482686 + $2 * 119.950519 + $3 * 11.6012125" & chr(34)
+			boolWPlane = True
+		
+		Case "LEED 90% view: Export Plane"
+			dblMaxLength = 0.5
+			dblMinLength = 0.01
+			strSkyType = "special"
+			strRenderPara = "render= -st .001 -dj .02 -i -aa 0.005 -av 0 0 0"
+			strWPlane_eq = chr(34) & "$1 = ($1 + $2 + $3) / 9.4247777961 * 100" & chr(34)
+			boolWPlane = True
+
+		Case "Glare"
+			dblMaxLength = 100
+			dblMinLength = 0.01
+			strSkyType = "9 22 12:0 +s"
+			strRenderPara = "render= -st .001 -dj .02 -ad 2048"
+			strRunLine = "rad -v view ./model.rif REP=1"
+  	  
+	End Select
+
+	'Rename all layers to avoid spaces or symbols in the layer name
+	'Call CorrectLayer
+
+	'If working plane will be exported, a list box will appear for choosing
+	'which layers for Radiance and which layers are working plane only
+	If boolWPlane Then
+		ReDim arrLayerChoice(0)
+		ReDim arrLayerDefault(0)
+		arrLayerName = Rhino.LayerNames
+		For Each strLayerName In arrLayerName
+			If Rhino.IsLayerVisible(strLayerName) Then
+				arrObjects = Rhino.ObjectsByLayer(strLayerName, 0)
+				If IsArray(arrObjects) Then
+					ReDim Preserve arrLayerChoice(UBound(arrLayerChoice)+1)
+					ReDim Preserve arrLayerDefault(UBound(arrLayerDefault)+1)
+					arrLayerChoice(UBound(arrLayerChoice) - 1) = strLayerName
+					arrLayerDefault(UBound(arrLayerDefault) - 1) = 1
+				End If
+			End If
+		Next
+		ReDim Preserve arrLayerChoice(UBound(arrLayerChoice)-1)
+		ReDim Preserve arrLayerDefault(UBound(arrLayerDefault)-1)
+
+		'Show list box for choosing layers for Radiance
+		arrLayerResults = Rhino.CheckListBox(arrLayerChoice, arrLayerDefault, "Radiance Objects", "Export...")
+  	
+		'Layers not yet selected in the above list box will be set as default
+		For i = 0 To UBound(arrLayerResults)
+			If arrLayerResults(i) Then arrLayerDefault(i) = False
+		Next
+		'Show list box for choosing layers for working plane
+		arrWPlaneResults = Rhino.CheckListBox(arrLayerChoice, arrLayerDefault, "Working Plane", "Export...")
+	End If
+  
+	'If working plane will be exported, all layers for Radiance will be turned on while other layers turned off
+	'It is required to set one of the layers to be current layer first
+	If boolWPlane And Not IsNull(arrLayerResults) Then
+		For i = 0 To UBound(arrLayerChoice)
+			If arrLayerResults(i) Then
+				Rhino.CurrentLayer arrLayerChoice(i)
+				Exit For
+			End If
+		Next
+		For Each strLayerName In arrLayerName
+			Rhino.LayerVisible strLayerName, False
+		Next
+		For i = 0 To UBound(arrLayerChoice)
+			If arrLayerResults(i) Then
+				Rhino.LayerVisible arrLayerChoice(i), True
+			Else
+				Rhino.LayerVisible arrLayerChoice(i), False
+			End If
+		Next
+	End If
+
+	'Generate the model.rif and view.vf
+	If arrResults(0) Then Call rifcontrol(arrFileName(0), strRenderPara)
+	If arrResults(1) Then
+		If strResult = "LEED 90% view: Export Plane" Then
+			Call GenSpecialSky(arrFileName(1))
+		Else
+			Call GenSky(arrFileName(1), strSkyType)
+		End If
+	End If
+
+	If arrResults(3) Then
+		'Check if there is any object in the visible layers
+		If boolWPlane Then
+			boolFound = False
+			For i = 0 To UBound(arrLayerChoice)
+				If arrLayerResults(i) And Rhino.IsLayerVisible(arrLayerChoice(i)) Then
+					arrObjects = Rhino.ObjectsByLayer(arrLayerChoice(i), 0)
+					If IsArray(arrObjects) Then
+						boolFound = True
+						Exit For
+					End If
+				End If
+			Next
+		End If
+		'Generate the .obj files if there is object in the visible layers or not exporting working plane  
+		If boolFound Or Not boolWPlane Then Call geometry(strRadPath, dblMaxLength, dblMinLength, True)
+	End If
+
+	If arrResults(5) Then
+		If strResult = "Glare" Then
+			GenViewFishEye(arrFileName(5))
+		Else
+			GenView(arrFileName(5))
+		End If
+	End If
+	If arrResults(6) Then Call Run_file(arrFileName(6), strRunLine)
+	If arrResults(7) Then Call ConvertTiff(arrFileName(7))
+	If arrResults(8) Then Call ConvertHuman(arrFileName(8))
+	
+	'Define which files need to be created first, and then write content into it by each layer
+	For i = 0 To UBound(arrFileName)
+		arrBoolEachLayer(i) = False
+	Next
+	arrBoolEachLayer(2) = True
+	arrBoolEachLayer(4) = True
+	arrBoolEachLayer(9) = True
+	arrBoolEachLayer(11) = True
+	arrBoolEachLayer(12) = True
+	arrBoolEachLayer(13) = True
+	
+	'Create files
+	Set objFSO = CreateObject("Scripting.FileSystemObject")
+	arrLayerName = Rhino.LayerNames
+	
+	For i = 0 To UBound(arrFileName)
+		If arrResults(i) And arrBoolEachLayer(i) Then
+			Set objStream = objFSO.CreateTextFile(arrFileName(i), True)
+			objStream.Close
+		End If
+	Next
+  
+	'Create Run_WPlane.bat
+	If arrResults(10) And boolWPlane Then
+		Set objStream = objFSO.CreateTextFile(arrFileName(10), True)
+		objStream.WriteLine "rad -v 0 model.rif"
+	End If
+  
+	'Create CalcArea.bat
+	If arrResults(14) Then
+		Set objStream = objFSO.CreateTextFile(arrFileName(14), True)
+		Select Case strResult
+			Case "Daylight (Working Plane)"
+				objStream.WriteLine "del Daylight.txt"
+				strOutfile = "Daylight.txt"
+				dblThreshold = 0	
+			Case "Solar Irradiation (Working Plane)"
+				objStream.WriteLine "del Irradiation.txt"
+				strOutfile = "Irradiation.txt"
+				dblThreshold = 0
+			Case "LEED 75% daylight: Export Plane"
+				objStream.WriteLine "del LEED75.txt"
+				strOutfile = "LEED75.txt"
+				dblThreshold = 270
+			Case "LEED 90% view: Export Plane"
+				objStream.WriteLine "del LEED90.txt"
+				strOutfile = "LEED90.txt"
+				dblThreshold = 0.01
+		End Select
+		objStream.Close
+	End If
+
+	'Create CombineOutput.bat
+	If arrResults(15) Then
+		Set objStream = objFSO.CreateTextFile(arrFileName(15), True)
+		objStream.WriteLine "rm Combine_output.vtk"
+		objStream.Close
+	End If
+    
+	Set objFSO = Nothing
+	
+	'Write files required (for Radiance simulation)
+	For Each strLayerName In arrLayerName
+		If Rhino.IsLayerVisible(strLayerName) Then
+			arrObjects = Rhino.ObjectsByLayer(strLayerName, 0)
+			If IsArray(arrObjects) Then
+				If arrResults(2) Then Call material(arrFileName(2), strLayerName)
+				If arrResults(4) Then Call ObjtoRad(arrFileName(4), strLayerName)
+			End If
+		End If
+	Next
+
+
+	'If working plane will be exported, now all layers for working plane will be turned on while other layers turned off
+	'It is required to set one of the layers to be current layer first
+	If boolWPlane And Not IsNull(arrWPlaneResults) Then
+		For i = 0 To UBound(arrLayerChoice)
+			If arrWPlaneResults(i) Then
+				Rhino.CurrentLayer arrLayerChoice(i)
+				Exit For
+			End If
+		Next
+		For Each strLayerName In arrLayerName
+			Rhino.LayerVisible strLayerName, False
+		Next
+		For i = 0 To UBound(arrLayerChoice)
+			If arrWPlaneResults(i) Then
+				Rhino.LayerVisible arrLayerChoice(i), True
+			Else
+				Rhino.LayerVisible arrLayerChoice(i), False
+			End If
+		Next
+
+
+		'If working plane will be exported, first check is there any object in all visible layers
+		'then generate the .obj files
+		If arrResults(3) Then
+			boolFound = False
+			For i = 0 To UBound(arrLayerChoice)
+				If arrWPlaneResults(i) And Rhino.IsLayerVisible(arrLayerChoice(i)) Then
+					arrObjects = Rhino.ObjectsByLayer(arrLayerChoice(i), 0)
+					If IsArray(arrObjects) Then
+						boolFound = True
+						Exit For
+					End If
+				End If
+			Next
+			If boolFound Then Call geometry(strRadPath, dblMaxLength, dblMinLength, True)
+		End If
+  
+		'Write files required (for working plane calculation)
+		For Each strLayerName In arrLayerName
+			If Rhino.IsLayerVisible(strLayerName) Then
+				arrObjects = Rhino.ObjectsByLayer(strLayerName, 0)
+				If IsArray(arrObjects) Then
+					If arrResults(9) Then Call ObjtoVTK(arrFileName(9), strLayerName)
+					If arrResults(10) Then Call WPlane(arrFileName(10), strLayerName, strWPlane_eq)
+					If arrResults(11) Then Call MergeResult(arrFileName(11), strLayerName)
+					If arrResults(12) Then Call VTKtoTec(arrFileName(12), strLayerName)
+					If arrResults(13) Then Call changenormal(arrFileName(13), strLayerName)
+					If arrResults(14) Then Call Check_area(arrFileName(14), strLayerName, dblThreshold, strOutfile)
+					If arrResults(15) Then Call CombineOutput(arrFileName(15), strLayerName)
+				End If
+			End If
+		Next
+  
+	End If
+
+	'Write Galre.bat
+	If arrResults(16) Then Call Glare_bat(arrFileName(16))
+
+	'Write perl files required
+	If arrResults(17) Then Call MakePerl(strRadPath, "changeNormals")
+	If arrResults(18) Then Call MakePerl(strRadPath, "combinefile")
+	If arrResults(19) Then Call MakePerl(strRadPath, "CreateShadows")
+	If arrResults(20) Then Call MakePerl(strRadPath, "makeSkies")
+	If arrResults(21) Then Call MakePerl(strRadPath, "mergefile")
+	If arrResults(22) Then Call MakePerl(strRadPath, "vtk2result")
+	If arrResults(23) Then Call MakePerl(strRadPath, "makeRadplane")
+	If arrResults(24) Then Call MakePerl(strRadPath, "vtk2tecplot")
+	If arrResults(25) Then Call MakePerl(strRadPath, "objchecker")
+  
+	'Turn on all layers as before running the script
+	If boolWPlane Then
+		For i = 0 To UBound(arrLayerChoice)
+			If arrWPlaneResults(i) Or arrLayerResults(i) Then
+				Rhino.LayerVisible arrLayerChoice(i), True
+			End If
+		Next
+	End If
+    
+End Sub
+
+
+Sub Run_file(strFilePath, strRunLine)
+	Dim objFSO, objStream
+	Set objFSO = CreateObject("Scripting.FileSystemObject")
+	Set objStream = objFSO.CreateTextFile(strFilePath, True)
+	objStream.WriteLine "del model.opt"
+	objStream.WriteLine "del model.oct"
+	objStream.WriteLine strRunLine
+	objStream.Close
+	Set objFSO = Nothing
+End Sub
+
+
+Sub Glare_bat(strFilePath)
+	Dim objFSO, objStream
+	Set objFSO = CreateObject("Scripting.FileSystemObject")
+	Set objStream = objFSO.CreateTextFile(strFilePath, True)
+	objStream.WriteLine "findglare -p model_view.pic > model.glr"
+	objStream.WriteLine "xglaresrc model_view.pic model.glr"
+	objStream.Close
+	Set objFSO = Nothing
+End Sub
+
+
+Sub geometry(strPath, dblMaxLength, dblMinLength, boolEx)
+	Dim arrLayerName, strLayerName
+	Dim arrObjects
+	Dim strSchemeOptions, strObjOptions, strMshOptions
+	' default values for strings stored/assigned
+	dblMaxLength = Rhino.RealBox("Maximum Edge Length?", dblMaxLength)
+	dblMinLength = Rhino.RealBox("Minimum Edge Length?", dblMinLength)
+
+	strSchemeOptions = "Scheme dxfsurface Enter"
+	strObjOptions = "Geometry=Mesh  Trims=Polylines  ExportRhinoObjectNames=ExportObjectsAsOBJObjects  ExportRhinoGroupOrLayerNames=ExportLayersAsOBJGroups  ExportMaterialDefinitions=No  YUp=No Enter "
+	strMshOptions = "DetailedOptions AdvancedOptions Angle=50 AspectRatio=20 Distance=0 MaxedgeLength=" & dblMaxLength & " MinEdgeLength=" & dblMinLength & " Enter Enter "
+ 
+	arrLayerName = Rhino.LayerNames
+	Rhino.UnselectAllObjects
+
+	For Each strLayerName In arrLayerName
+		If Rhino.IsLayerVisible(strLayerName) Then
+			arrObjects = Rhino.ObjectsByLayer(strLayerName, 1)
+			If IsArray(arrObjects) Then
+				If boolEx Then
+					Call exportobj(strPath, strLayerName, strObjOptions, strMshOptions)
+				End If
+			End If
+			Rhino.UnselectAllObjects
+		End If
+	Next
+End Sub
+
+
+Sub Rifcontrol(strFilePath, strRenderPara)
+	Dim arrObjects, arrBox
+	Dim xyzmin, xyzmax, xmin, xmax, ymin, ymax, zmin, zmax
+	Dim arrLayerName, strLayerName
+	Dim objFSO, objStream
+	Set objFSO = CreateObject("Scripting.FileSystemObject")
+	Set objStream = objFSO.CreateTextFile(strFilePath, True)
+	' Get the model bounding box
+	arrObjects = Rhino.NormalObjects
+	If IsArray(arrObjects) Then
+		arrBox = Rhino.BoundingBox(arrObjects)
+		If IsArray(arrBox) Then
+			xyzmin = arrBox(0)
+			xyzmax = arrBox(6)
+			xmin = Round(xyzmin(0), 2)
+			xmax = Round(xyzmax(0), 2)
+			ymin = Round(xyzmin(1), 2)
+			ymax = Round(xyzmax(1), 2)
+			zmin = Round(xyzmin(2), 2)
+			zmax = Round(xyzmax(2), 2)
+		End If
+	End If
+	
+	'Write Zone Size
+	'objStream.WriteLine "ZONE = I " & xmin & " " & xmax & " " & ymin & " " & ymax & " " & zmin & " " & zmax
+	objStream.WriteLine "ZONE = I 0 1 0 1 0 1"
+	
+	'Write scene
+	arrLayerName = Rhino.LayerNames
+	For Each strLayerName In arrLayerName
+		If Rhino.IsLayerVisible(strLayerName) Then
+			arrObjects = Rhino.ObjectsByLayer(strLayerName, 0)
+			If IsArray(arrObjects) Then
+				objStream.WriteLine "scene = " & strLayerName & ".rad"
+			End If
+		End If
+	Next
+	
+	objStream.WriteLine "materials = materials.mat"
+	objStream.WriteLine "scene= sky.rad"
+	objStream.WriteLine "#add illum if needed"
+	objStream.WriteLine "#illum=window.rad"
+	objStream.WriteLine "view= view -vf view.vf"
+	objStream.WriteLine "OCTREE= model.oct"
+	objStream.WriteLine "EXPOSURE= 1"
+	objStream.WriteLine "UP= Z"
+	objStream.WriteLine "RESOLUTION= 512 512"
+	objStream.WriteLine "QUALITY= M"
+	objStream.WriteLine "PENUMBRAS= F"
+	objStream.WriteLine "INDIRECT= 1"
+	objStream.WriteLine "DETAIL= M"
+	objStream.WriteLine "VARIABILITY= M"
+	objStream.WriteLine "OPTFILE= model.opt"
+	objStream.WriteLine "oconv= -f"
+	objStream.WriteLine "#@mkillum= -ab 3 -ad 512 -as 256"
+	objStream.WriteLine strRenderPara
+	objStream.WriteLine "pfilt= -2"
+	objStream.WriteLine "#@northarrow= nonedefined xform -rz 0"
+	objStream.WriteLine "# AMBFILE= model.amb"
+	objStream.Close
+	Set objFSO = Nothing
+End Sub
+
+
+Sub exportobj(strPath, strName, strObjOptions, strMshOptions)
+	Dim strCmd
+	'Export to .obj
+	strCmd = "-_Export " & strPath & strName & ".obj " & strObjOptions & strMshOptions
+	Rhino.command strCmd
+End Sub
+
+
+Sub ObjtoRad(strFilePath, strName)
+	Dim objFSO, objStream
+	Set objFSO = CreateObject("Scripting.FileSystemObject")
+	Set objStream = objFSO.OpenTextFile(strFilePath, 8, True)
+	objStream.WriteLine "perl objchecker.pl " & strName & ".obj"
+	'Write to obj2rad file
+	objStream.WriteLine "obj2rad " & strName & ".obj > " & strName & ".rad "
+	objStream.Close
+End Sub
+
+
+Sub changenormal(strFilePath, strName)
+	Dim objFSO, objStream
+	Set objFSO = CreateObject("Scripting.FileSystemObject")
+	Set objStream = objFSO.OpenTextFile(strFilePath, 8, True)
+	'Write to changenormal file
+	objStream.WriteLine "perl changenormals.pl < " & strName & ".pts > " & strName & ".tmp"
+	objStream.WriteLine "del " & strName & ".pts"
+	objStream.WriteLine "rename " & strName & ".tmp " & strName & ".pts"
+	objStream.WriteLine "del " & strName & ".tmp"
+	objStream.Close
+	Set objFSO = Nothing
+End Sub
+
+
+Sub ObjtoVTK(strFilePath, strName)
+	Dim objFSO, objStream
+	Set objFSO = CreateObject("Scripting.FileSystemObject")
+	Set objStream = objFSO.OpenTextFile(strFilePath, 8, True)
+	'Write to batch file
+	objStream.WriteLine "perl objchecker.pl " & strName & ".obj"
+	objStream.WriteLine "perl makeRadplane.pl < " & strName & ".obj"
+	objStream.WriteLine "if EXIST " & strName & ".pts Del " & strName & ".pts"
+	objStream.WriteLine "Rename RadPlane.dat " & strName & ".pts"
+	objStream.WriteLine "if EXIST " & strName & ".vtk Del " & strName & ".vtk"
+	objStream.WriteLine "Rename VTKPlane.vtk " & strName & ".vtk"
+	objStream.Close
+	
+	Set objFSO = Nothing
+End Sub
+
+
+Sub WPlane(strFilePath, strName, strWPlane_eq)
+	Dim objFSO, objStream
+	Set objFSO = CreateObject("Scripting.FileSystemObject")
+	Set objStream = objFSO.OpenTextFile(strFilePath, 8, True)
+	'Write to batch file
+	objStream.WriteLine "del " & strName & ".out"
+	objStream.WriteLine "type " & strName & ".pts | rtrace @model.opt -h -ov -I -dv- -x 1 model.oct | rcalc -e " & strWPlane_eq & " >> " & strName & ".out"
+	objStream.Close
+	
+	Set objFSO = Nothing
+End Sub
+
+
+Sub MergeResult(strFilePath, strName)
+	Dim objFSO, objStream
+	Set objFSO = CreateObject("Scripting.FileSystemObject")
+	Set objStream = objFSO.OpenTextFile(strFilePath, 8, True)
+	objStream.WriteLine "perl mergefile.pl " & strName & ".vtk " & strName & ".out"
+	objStream.Close
+	Set objFSO = Nothing
+End Sub
+
+
+Sub CombineOutput(strFilePath, strName)
+	Dim objFSO, objStream
+	Set objFSO = CreateObject("Scripting.FileSystemObject")
+	Set objStream = objFSO.OpenTextFile(strFilePath, 8, True)
+	objStream.WriteLine "perl combinefile.pl Combined_output.vtk " & strName & "_output.vtk "
+	objStream.Close
+	Set objFSO = Nothing
+End Sub
+
+
+Sub VTKtoTec(strFilePath, strName)
+	Dim objFSO, objStream
+	Set objFSO = CreateObject("Scripting.FileSystemObject")
+	Set objStream = objFSO.OpenTextFile(strFilePath, 8, True)
+	objStream.WriteLine "perl vtk2tecplot.pl " & strName & "_output.vtk"
+	objStream.Close
+	Set objFSO = Nothing
+End Sub
+
+
+Sub Check_area(strFilePath, strName, dblThreshold, strOutfile)
+	Dim objFSO, objStream
+	Set objFSO = CreateObject("Scripting.FileSystemObject")
+	Set objStream = objFSO.OpenTextFile(strFilePath, 8, True)
+	objStream.WriteLine "perl vtk2result.pl " & dblThreshold & " " & strName & "_output.vtk " & strOutfile
+	objStream.Close
+	Set objFSO = Nothing
+End Sub
+
+
+Sub GenSky(strFilePath, strSkyType)
+	Dim objFSO, objStream
+	Set objFSO = CreateObject("Scripting.FileSystemObject")
+	Set objStream = objFSO.CreateTextFile(strFilePath, True)
+	objStream.WriteLine "!gensky " & strSkyType & " -a 31.12 -o -121.30 -m -120.00 -t 2.00 | xform -rz 0.00"
+	objStream.WriteLine "# Outside Paramaters."
+	objStream.WriteLine "skyfunc glow sky_glow"
+	objStream.WriteLine "0"
+	objStream.WriteLine "0"
+	objStream.WriteLine "4 .986 .986 1.2020135 0"
+	objStream.WriteLine "sky_glow source sky"
+	objStream.WriteLine "0"
+	objStream.WriteLine "0"
+	objStream.WriteLine "4 0 0 1 180"
+	objStream.WriteLine "skyfunc glow ground_glow"
+	objStream.WriteLine "0"
+	objStream.WriteLine "0"
+	objStream.WriteLine "4 1 .7 .25 0"
+	objStream.WriteLine "ground_glow source ground"
+	objStream.WriteLine "0"
+	objStream.WriteLine "0"
+	objStream.WriteLine "4 0 0 -1 180"
+	objStream.Close
+	Set objFSO = Nothing
+End Sub
+
+
+Sub GenSpecialSky(strFilePath)
+	Dim objFSO, objStream
+	Set objFSO = CreateObject("Scripting.FileSystemObject")
+	Set objStream = objFSO.CreateTextFile(strFilePath, True)
+	objStream.WriteLine "void brightfunc skyfunc"
+	objStream.WriteLine "2 skybr skyview.cal"
+	objStream.WriteLine "0"
+	objStream.WriteLine "3 2 1 0"
+	objStream.WriteLine "skyfunc glow sky_glow"
+	objStream.WriteLine "0"
+	objStream.WriteLine "0"
+	objStream.WriteLine "4 1 1 1 0"
+	objStream.WriteLine "sky_glow source sky"
+	objStream.WriteLine "0"
+	objStream.WriteLine "0"
+	objStream.WriteLine "4 0 0 1 180"
+	objStream.Close
+	Set objFSO = Nothing
+End Sub
+
+
+Sub material(strFilePath, strName)
+	Dim arrObjects
+	Dim index, matName, matType, matTransparency, myreflection, matShine, Tn, Spec, Rough
+	Dim objFSO, objStream
+	Set objFSO = CreateObject("Scripting.FileSystemObject")
+	Set objStream = objFSO.OpenTextFile(strFilePath, 8, True)
+  
+	arrObjects = Rhino.ObjectsByLayer(strName, 0)
+
+	If IsArray(arrObjects) Then
+		index = Rhino.layerMaterialIndex(strName)
+		matName = strName
+		matType = Rhino.MaterialName(index)
+		matTransparency = Rhino.MaterialTransparency(index)
+				
+		'Use shine data as reflectance 				
+		myreflection = 0.3
+		matShine = Rhino.MaterialShine(index) / 255
+		If matShine = 0 Or IsNull(matshine)Then
+			matshine = myreflection
+		End If
+		'Glass type material'
+		If (matType = "glass") Or (matTransparency > 0) Then
+			Tn = matTransparency
+			Tn = Round(((.84025+.00725*Tn*Tn)^0.5 - .91665)/(.00363 * Tn),2)
+	                       
+			objStream.WriteLine "void glass " & matName
+			objStream.WriteLine "0"
+			objStream.WriteLine "0"
+			objStream.WriteLine "3 " & Round(Tn, 2) & " " & Round(Tn, 2) & " " & Round(Tn, 2)
+			objStream.WriteLine ""
+		Else
+			'Plastic type material'
+			Spec = 0    'Specularity of plastic (between 0 and 0.1)'
+			Rough = 0    'Roughness of surface (betwen 0 and 0.2)'
+			objStream.WriteLine "void plastic " & matName
+			objStream.WriteLine "0"
+			objStream.WriteLine "0"
+			objStream.WriteLine "5 " & Round(matShine, 2) & " " & Round(matShine, 2) & " " & Round(matShine, 2) & " " & Spec & " " & Rough
+			objStream.WriteLine ""
+		End If
+	End If
+	objStream.Close
+	Set objFSO = Nothing
+End Sub
+
+
+Sub GenView(strFilePath)
+	Dim strCamera, strTarget, strLine, strInput1, strInput2, strInput3
+	Dim boolViewType
+	Dim CameraSize, hsize, vsize
+	Dim objFSO, objStream
+	
+	Set objFSO = CreateObject("Scripting.FileSystemObject")
+	Set objStream = objFSO.CreateTextFile(strFilePath, True)
+
+	strCamera = Rhino.ViewCamera
+	strTarget = Rhino.ViewTarget
+	boolViewType = Rhino.IsViewPerspective
+
+	objStream.WriteLine "#-vt? if ? = v then perspective view if ? = l then parallel view"
+	strLine = "rview "
+	If boolViewType Then
+		CameraSize = Rhino.ViewCameraLens
+		hsize = 2 * 180 / 3.14159 * rhino.atan2(36 / 2, CameraSize)
+		vsize = 2 * 180 / 3.14159 * rhino.atan2(24 / 2, CameraSize)
+		strInput3 = " -vu 0 0 1 -vh " & Round(hsize, 2) & " -vv " & Round(vsize, 2)
+		strLine = strLine & "-vtv"
+	Else
+		CameraSize = Rhino.Viewradius
+		strInput3 = " -vu 0 1 0 -vh " & FormatNumber(CameraSize * 2) & " -vv " & FormatNumber(CameraSize * 2)
+		strLine = strLine & "-vtl"
+	End If
+	strInput1 = Round(strCamera(0), 2) & " " & Round(strCamera(1), 2) & " " & Round(strCamera(2), 2)
+	strInput2 = Round(strTarget(0), 2) - Round(strCamera(0), 2) & " " & Round(strTarget(1), 2) - Round(strCamera(1), 2) & " " & Round(strTarget(2), 2) - Round(strCamera(2), 2)
+	strLine = strLine & " -vp " & strInput1 & " -vd " & strInput2 & strInput3
+	objStream.WriteLine strLine
+	objStream.Close
+	Set objFSO = Nothing
+End Sub
+
+
+Sub GenViewFishEye(strFilePath)
+	Dim strCamera, strTarget, strLine, strInput1, strInput2, strInput3
+	Dim boolViewType
+	Dim CameraSize, hsize, vsize
+	Dim objFSO, objStream
+	
+	Set objFSO = CreateObject("Scripting.FileSystemObject")
+	Set objStream = objFSO.CreateTextFile(strFilePath, True)
+
+	strCamera = Rhino.ViewCamera
+	strTarget = Rhino.ViewTarget
+	boolViewType = Rhino.IsViewPerspective
+
+	objStream.WriteLine "#-vt? if ? = v then perspective view if ? = l then parallel view"
+	strLine = "rview "
+
+	CameraSize = Rhino.ViewCameraLens
+	hsize = 2 * 180 / 3.14159 * rhino.atan2(36 / 2, CameraSize)
+	vsize = 2 * 180 / 3.14159 * rhino.atan2(24 / 2, CameraSize)
+	strInput3 = " -vu 0 0 1 -vh 180 -vv 180"
+	strLine = strLine & "-vth"
+
+	strInput1 = Round(strCamera(0), 2) & " " & Round(strCamera(1), 2) & " " & Round(strCamera(2), 2)
+	strInput2 = Round(strTarget(0), 2) - Round(strCamera(0), 2) & " " & Round(strTarget(1), 2) - Round(strCamera(1), 2) & " " & Round(strTarget(2), 2) - Round(strCamera(2), 2)
+	strLine = strLine & " -vp " & strInput1 & " -vd " & strInput2 & strInput3
+	objStream.WriteLine strLine
+	objStream.Close
+	Set objFSO = Nothing
+End Sub
+
+
+Sub ConvertTiff(strTiffFilePath)
+	Dim objFSO, objStream
+	Set objFSO = CreateObject("Scripting.FileSystemObject")
+	Set objStream = objFSO.CreateTextFile(strTiffFilePath, True)
+	objStream.WriteLine "falsecolor -i model_view.pic -p model_view.pic -s 5400 -n 10 -l Lux > model_view_cont.pic"
+	objStream.WriteLine ""
+	objStream.WriteLine "ra_tiff model_view_cont.pic model_view_cont.tiff"
+	objStream.WriteLine "ra_tiff model_view.pic model_view.tiff"
+	objStream.Close
+	Set objFSO = Nothing
+End Sub
+
+
+Sub ConvertHuman(strHumanFilePath)
+	Dim objFSO, objStream
+	Set objFSO = CreateObject("Scripting.FileSystemObject")
+	Set objStream = objFSO.CreateTextFile(strHumanFilePath, True)
+	objStream.WriteLine "pcond -h model_view.pic > model_view_pcd.pic"
+	objStream.WriteLine "ra_tiff model_view_pcd.pic model_view_pcd.tiff"
+	objStream.Close
+	Set objFSO = Nothing
+End Sub
+
+
+Public Function matEnergy (matColourR, matColourG, matColourB)
+	matEnergy = 0.065 * matColourB / 255 + 0.67 * matColourG / 255 + 0.265 * matColourR / 255
+End Function
+
+
+Public Function GetRValue (val)
+	If val > -1 And val < 16777216 Then
+		GetRValue = val \ 256 ^ 0 And 255
+	Else
+		GetRValue = -1
+	End If
+End Function
+
+
+Public Function GetGValue (val)
+	If val > -1 And val < 16777216 Then
+		GetGValue = val \ 256 ^ 1 And 255
+	Else
+		GetGValue = -1
+	End If
+End Function
+
+
+Public Function GetBValue (val)
+	If val > -1 And val < 16777216 Then
+		GetBValue = val \ 256 ^ 2 And 255
+	Else
+		GetBValue = -1
+	End If
+End Function
+
+
+Sub CorrectLayer
+	Dim arrLayerName, strLayerName, strLayerNameCheck, strNewLayerName
+	arrLayerName = Rhino.LayerNames
+	For Each strLayerName In arrLayerName
+		strNewLayerName = strLayerName
+		strNewLayerName = ReplaceChar(strNewLayerName, 32, 47)
+		strNewLayerName = ReplaceChar(strNewLayerName, 58, 64)
+		strNewLayerName = ReplaceChar(strNewLayerName, 91, 96)
+		strNewLayerName = ReplaceChar(strNewLayerName, 123, 126)
+		If strNewLayerName <> strLayerName Then
+			For Each strLayerNameCheck In arrLayerName
+				If strNewLayerName = strLayerNameCheck Then
+					strNewLayerName = strNewLayerName & "_1"
+				End If
+			Next
+			Rhino.RenameLayer strLayerName, strNewLayerName
+		End If
+	Next
+End Sub
+
+
+Function ReplaceChar(strName, intCharStart, intCharEnd)
+	Dim i, arrName
+	For i = intCharStart To intCharEnd
+		arrName = Split(strName, Chr(i))
+		strName = Join(arrName, "_")
+	Next
+	ReplaceChar = strName
+End Function
+
+
+Sub MakePerl(strPath, strPerl)
+	Dim objFSO, objStream, strLine, strFilePath
+	Select Case strPerl
+		Case "changeNormals"
+			strLine = "while (<stdin>){" & VbCrLf & "    chomp;" & VbCrLf & "    ($x,$y,$z,$nx,$ny,$nz)=split(/\s+/);" & VbCrLf & "    print ""$x $y $z 0 0 1\n"";" & VbCrLf & "}"
+		Case "combinefile"
+			strLine = "($file1,$file2)=@ARGV;" & VbCrLf & "" & VbCrLf & "$boolFileFound = 1;" & VbCrLf & "open(F1,$file1) or $boolFileFound = 0;" & VbCrLf & "open(F2,$file2) or die""XX"";" & VbCrLf & "" & VbCrLf & "$outfile=""Combined_output.vtk"";" & VbCrLf & "" & VbCrLf & "if ($boolFileFound == 1) {" & VbCrLf & "    ($name,$temp1)= split(/\./,$file1);" & VbCrLf & "" & VbCrLf & "    open(TEMPPT,"">temppt.tmp"") or die""XX"";" & VbCrLf & "    open(TEMPPTDATA,"">tempptdata.tmp"") or die""XX"";" & VbCrLf & "    open(TEMPPOLYGONS,"">temppolygons.tmp"") or die""XX"";" & VbCrLf & "" & VbCrLf & "    $startpt = 0;" & VbCrLf & "    $startptdata = 0;" & VbCrLf & "    $startpolygons = 0;" & VbCrLf & "" & VbCrLf & "    while (<F1>) {" & VbCrLf & "        $line=$_;" & VbCrLf & "        @temp = split(/\s+/,$line);" & VbCrLf & "        if ($startpt) {" & VbCrLf & "            $count++;" & VbCrLf & "            if ($count <= $nopt1) {" & VbCrLf & "                print TEMPPT ""$line"";" & VbCrLf & "            }" & VbCrLf & "        }" & VbCrLf & "        if ($startpolygon) {" & VbCrLf & "            $count++;" & VbCrLf & "            if ($count <= $nopolygons1) {" & VbCrLf & "                print TEMPPOLYGONS ""$line"";" & VbCrLf & "            }" & VbCrLf & "        }" & VbCrLf & "        if ($startptdata) {" & VbCrLf & "            print TEMPPTDATA ""$line"";" & VbCrLf & "        }" & VbCrLf & "        if ($temp[0] eq ""POINTS"") {" & VbCrLf & "            $nopt1 = $temp[1];" & VbCrLf & "            $count = 0;" & VbCrLf & "            $startpt = 1;" & VbCrLf & "        }" & VbCrLf & "        if ($temp[0] eq ""POLYGONS"") {" & VbCrLf & "            $nopolygons1 = $temp[1];" & VbCrLf & "            $nopolydata1 = $temp[2];" & VbCrLf & "            $count = 0;" & VbCrLf & "            $startpt = 0;" & VbCrLf & "            $startpolygon = 1;" & VbCrLf & "        }" & VbCrLf & "        if ($temp[0] eq ""LOOKUP_TABLE"") {" & VbCrLf & "            $startpolygon = 0;" & VbCrLf & "            $startptdata = 1;" & VbCrLf & "        }" & VbCrLf & "    };" & VbCrLf & "" & VbCrLf & "    $startpt = 0;" & VbCrLf & "    $startptdata = 0;" & VbCrLf & "    $startpolygons = 0;" & VbCrLf & "    while (<F2>) {" & VbCrLf & "        $line=$_;" & VbCrLf & "        @temp = split(/\s+/,$line);" & VbCrLf & "        if ($startpt) {" & VbCrLf & "            $count++;" & VbCrLf & "            if ($count <= $nopt2) {" & VbCrLf & "                print TEMPPT ""$line"";" & VbCrLf & "            }" & VbCrLf & "        }" & VbCrLf & "        if ($startpolygon) {" & VbCrLf & "            $count++;" & VbCrLf & "            if ($count <= $nopolygons2) {" & VbCrLf & "                print TEMPPOLYGONS ""$temp[0]"";" & VbCrLf & "                $temp1 = $temp[1] + $nopt1;" & VbCrLf & "                print TEMPPOLYGONS "" $temp1"";" & VbCrLf & "                $temp1 = $temp[2] + $nopt1;" & VbCrLf & "                print TEMPPOLYGONS "" $temp1"";" & VbCrLf & "                $temp1 = $temp[3] + $nopt1;" & VbCrLf & "                print TEMPPOLYGONS "" $temp1"";" & VbCrLf & "                if ($temp[0] == 4) {" & VbCrLf & "                    $temp1 = $temp[4] + $nopt1;" & VbCrLf & "                    print TEMPPOLYGONS "" $temp1"";" & VbCrLf & "                }" & VbCrLf & "                print TEMPPOLYGONS ""\n"";" & VbCrLf & "            }" & VbCrLf & "        }" & VbCrLf & "        if ($startptdata) {" & VbCrLf & "            print TEMPPTDATA ""$line"";" & VbCrLf & "        }" & VbCrLf & "        if ($temp[0] eq ""POINTS"") {" & VbCrLf & "            $nopt2 = $temp[1];" & VbCrLf & "            $count = 0;" & VbCrLf & "            $startpt = 1;" & VbCrLf & "        }" & VbCrLf & "        if ($temp[0] eq ""POLYGONS"") {" & VbCrLf & "            $nopolygons2 = $temp[1];" & VbCrLf & "            $nopolydata2 = $temp[2];" & VbCrLf & "            $count = 0;" & VbCrLf & "            $startpt = 0;" & VbCrLf & "            $startpolygon = 1;" & VbCrLf & "        }" & VbCrLf & "        if ($temp[0] eq ""LOOKUP_TABLE"") {" & VbCrLf & "            $startpolygon = 0;" & VbCrLf & "            $startptdata = 1;" & VbCrLf & "        }" & VbCrLf & "    };" & VbCrLf & "" & VbCrLf & "    #while (<F2>) {" & VbCrLf & "    #$line=$_;" & VbCrLf & "    #print F3 ""$line"";" & VbCrLf & "    #};" & VbCrLf & "" & VbCrLf & "    close F1;" & VbCrLf & "    close F2;" & VbCrLf & "    close TEMPPT;" & VbCrLf & "    close TEMPPTDATA;" & VbCrLf & "    close TEMPPOLYGONS;" & VbCrLf & "" & VbCrLf & "    open(TEMPPT,""temppt.tmp"") or die""XX"";" & VbCrLf & "    open(TEMPPTDATA,""tempptdata.tmp"") or die""XX"";" & VbCrLf & "    open(TEMPPOLYGONS,""temppolygons.tmp"") or die""XX"";" & VbCrLf & "    open(F3,"">$outfile"") or die""XX"";" & VbCrLf & "" & VbCrLf & "    print F3 ""# vtk DataFile Version 2.0\n"";" & VbCrLf & "    print F3 ""My Test Plane\nASCII\nDATASET POLYDATA\n"";" & VbCrLf & "" & VbCrLf & "    $temp = $nopt1 + $nopt2;" & VbCrLf & "    print F3 ""POINTS $temp float\n"";" & VbCrLf & "" & VbCrLf & "    while (<TEMPPT>) {" & VbCrLf & "        print F3 ""$_"";" & VbCrLf & "    };" & VbCrLf & "" & VbCrLf & "    $temp = $nopolygons1 + $nopolygons2;" & VbCrLf & "    $temp1 = $nopolydata1 + $nopolydata2;" & VbCrLf & "    print F3 ""POLYGONS $temp $temp1\n"";" & VbCrLf & "" & VbCrLf & "    while (<TEMPPOLYGONS>) {" & VbCrLf & "        print F3 ""$_"";" & VbCrLf & "    };" & VbCrLf & "" & VbCrLf & "    $temp = $nopt1 + $nopt2;" & VbCrLf & "    print F3 ""POINT_DATA $temp\nSCALARS Irradiance float\n"";" & VbCrLf & "    print F3 ""LOOKUP_TABLE default\n"";" & VbCrLf & "" & VbCrLf & "    while (<TEMPPTDATA>) {" & VbCrLf & "        print F3 ""$_"";" & VbCrLf & "    };" & VbCrLf & "" & VbCrLf & "    close TEMPPT;" & VbCrLf & "    close TEMPPTDATA;" & VbCrLf & "    close TEMPPOLYGONS;" & VbCrLf & "    close F3;" & VbCrLf & "} else {" & VbCrLf & "    if ($file1 eq $outfile) {" & VbCrLf & "        open(OUT,"">$outfile"") or die""XX"";" & VbCrLf & "        while (<F2>) {" & VbCrLf & "            print OUT $_;" & VbCrLf & "        }" & VbCrLf & "        close F2;" & VbCrLf & "        close OUT;" & VbCrLf & "    } else {" & VbCrLf & "        print ""XX"";" & VbCrLf & "    }" & VbCrLf & "}"
+		Case "CreateShadows"
+			strLine = "$StartMonth = 6;" & VbCrLf & "$EndMonth = 6;" & VbCrLf & "$StartDay = 21;" & VbCrLf & "$EndDay = 21;" & VbCrLf & "$StartTime = 6;" & VbCrLf & "$EndTime=19;" & VbCrLf & "" & VbCrLf & "open(runbat,"">RunAll.bat"") or die ""Can't Create RunAll.bat"";" & VbCrLf & "open(ExPic_Tiff,"">Extiff.bat"") or die ""Can't Create ExTiff.bat"";" & VbCrLf & "open(ExPic_false,"">Exfalse.bat"") or die ""Can't Create Exfalse.bat"";" & VbCrLf & "open(ExPic_Hum,"">ExHuman.bat"") or die ""Can't Create ExHuman.bat"";" & VbCrLf & "" & VbCrLf & "for $Month($StartMonth..$EndMonth){" & VbCrLf & "    for $Day($StartDay..$EndDay){" & VbCrLf & "        print ""running\n"";" & VbCrLf & "        for $Time($StartTime..$EndTime){" & VbCrLf & "        " & VbCrLf & "        open (In_sky,""<sky.rad"") or die ""File not find: sky.rad\n"";" & VbCrLf & "        " & VbCrLf & "        $skyfile=join ("""",""sky_M"",$Month,""D"",$Day,""T"",$Time,"".rad"");" & VbCrLf & "        $ambfile=join ("""",""Amb_M"",$Month,""D"",$Day,""T"",$Time,"".amb"");" & VbCrLf & "        " & VbCrLf & "        " & VbCrLf & "            open (skyf,"">$skyfile"") or die ""xx"";" & VbCrLf & "            while(<In_sky>){" & VbCrLf & "                chomp;s/\""//g;" & VbCrLf & "                $myline=$_;" & VbCrLf & "                if (/gensky/){" & VbCrLf & "                    ($gen,$M,$D,$T,$skytype,@others)= split /\s+/, $_;" & VbCrLf & "                    $others=join("" "",@others);" & VbCrLf & "                    $myline=join ("""",""!gensky "",$Month,"" "",$Day,"" "",$Time,"":0"","" "",$skytype,"" "",$others);" & VbCrLf & "                }" & VbCrLf & "                print skyf ""$myline\n"" if defined $myline;" & VbCrLf & "            }" & VbCrLf & "        close In_sky;" & VbCrLf & "        close skyf;" & VbCrLf & "             " & VbCrLf & "        " & VbCrLf & "        open (In_rif,""<model.rif"") or die ""File not find: model.rif\n"";" & VbCrLf & "        " & VbCrLf & "            $riffile=join ("""",""model_M"",$Month,""D"",$Day,""T"",$Time);" & VbCrLf & "            $rifname=join("""",""$riffile"","".rif"");" & VbCrLf & "            open (riff,"">$rifname"") or die ""xx"";" & VbCrLf & "            while(<In_rif>){" & VbCrLf & "                chomp;s/\""//g;" & VbCrLf & "                $myline=$_;" & VbCrLf & "                if (/scene= sky.rad/){$myline=""scene = $skyfile""}" & VbCrLf & "                if (/AMBFILE= model.amb/){" & VbCrLf & "                    if (/#/){$myline=""# AMBFILE= $ambfile""}" & VbCrLf & "                }" & VbCrLf & "                print riff ""$myline\n"" if defined $myline;" & VbCrLf & "            }" & VbCrLf & "        close In_rif;" & VbCrLf & "        close riff;" & VbCrLf & "        " & VbCrLf & "        # write Batch file" & VbCrLf & "        print runbat ""del model.oct\n"";" & VbCrLf & "        print runbat ""del model.opt\n"";" & VbCrLf & "        print runbat ""rad -v view $rifname REP=1\n"";" & VbCrLf & "        " & VbCrLf & "        #Prepare file name" & VbCrLf & "        $outpic=join("""",$riffile,""_view.pic"");" & VbCrLf & "        $outtiff=join("""",$riffile,""_view.tiff""); " & VbCrLf & "        $outfalse=join("""",$riffile,""_false.tiff"");" & VbCrLf & "        $outHuman=join("""",$riffile,""_Human.tiff"");" & VbCrLf & "        " & VbCrLf & "        #Write Export to Tiff file" & VbCrLf & "        print ExPic_Tiff ""ra_tiff $outpic $outtiff\n"";" & VbCrLf & "        " & VbCrLf & "        #Write Export to Falsecolor" & VbCrLf & "        print ExPic_false ""falsecolor -i $outpic -p $outpic -s 5400 -n 10 -l Lux > temp.pic\n"";" & VbCrLf & "        print ExPic_false ""ra_tiff temp.pic $outfalse\n"";" & VbCrLf & "        " & VbCrLf & "        #Write Export to Human Sensitivity" & VbCrLf & "        print ExPic_Hum ""pcond -h $outpic > temp.pic\n"";" & VbCrLf & "        print ExPic_Hum ""ra_tiff temp.pic $outHuman\n"";" & VbCrLf & "        }" & VbCrLf & "    }" & VbCrLf & "}" & VbCrLf & "close In_sky;" & VbCrLf & "close In_rif;" & VbCrLf & "close ExTiff;" & VbCrLf & "close runbat;" & VbCrLf & "close ExPic_Hum;" & VbCrLf & "close ExPic_false;" & VbCrLf & ""
+		Case "makeSkies"
+			strLine = "#~ Create cummulative sky" & VbCrLf & "" & VbCrLf & "# use lib:math:trig" & VbCrLf & "use Math::Complex;" & VbCrLf & "use ARUP::solar::sunpath;" & VbCrLf & "" & VbCrLf & "$arg1a = 1;     # starting month" & VbCrLf & "$arg1b = 12;    # ending month" & VbCrLf & "$arg2a = 1;     # starting day" & VbCrLf & "$arg2b = 31;    # ending day" & VbCrLf & "$arg3a = 1;     # starting hour" & VbCrLf & "$arg3b = 24;    # ending hour" & VbCrLf & "" & VbCrLf & "$alt_segment = 1;" & VbCrLf & "$azi_segment = 1;" & VbCrLf & "" & VbCrLf & "# get start and endline" & VbCrLf & "$startline = (&daysinmonth($arg1a-1) + ($arg2a-1))*24 + $arg3a + 8;" & VbCrLf & "$endline = (&daysinmonth($arg1b-1) + ($arg2b-1))*24 + $arg3b + 8;" & VbCrLf & "print ""Starting Line of epw file: $startline\n"";" & VbCrLf & "print ""End line of epw file: $endline\n"";" & VbCrLf & "$i = 0;" & VbCrLf & "" & VbCrLf & "while(<stdin>){" & VbCrLf & "    chomp;$myline=$_;" & VbCrLf & "    $PI = 3.1415;" & VbCrLf & "# get site location, latitude, longitude, meridian and altitude" & VbCrLf & "    if($. ==1){" & VbCrLf & "        @line = split(/,/,$myline);" & VbCrLf & "        $loc=$line[1];" & VbCrLf & "        $lat=$line[6];" & VbCrLf & "        $lon=$line[7];" & VbCrLf & "        $mer=15*$line[8];" & VbCrLf & "        $href=$line[9];" & VbCrLf & "    }" & VbCrLf & "" & VbCrLf & "# loop through relevant data" & VbCrLf & "    " & VbCrLf & "    if(($. >= $startline)and($. <= $endline)){" & VbCrLf & "        @line = split(',',$myline);" & VbCrLf & "        # Check for gaps !!!" & VbCrLf & "        # Line[1] = Month" & VbCrLf & "        # Line[2] = day" & VbCrLf & "        # Line[3] = Hour" & VbCrLf & "        # Line[13] = Global Horizontal Irrad" & VbCrLf & "        # Line[14] = Direct Normal Irrad" & VbCrLf & "        # Line[15] = Diffuse Horizontal Irrad" & VbCrLf & "        # Line[22] = Total Sky Cover" & VbCrLf & "        # Line[23] = Opaque Sky Cover" & VbCrLf & "        if ($line[13] != 0) {" & VbCrLf & "            $month = $line[1];" & VbCrLf & "            $day = $line[2];" & VbCrLf & "            $hour = $line[3];" & VbCrLf & "            $DayOfYear = &daysinmonth($month-1) + $day;" & VbCrLf & "            $TimeOfDay = $hour;" & VbCrLf & "            " & VbCrLf & "            $STAdj = &stadj($DayOfYear,$mer,$lon);" & VbCrLf & "            $SolDec = &soldec($DayOfYear);" & VbCrLf & "            $SolTimeAdj = &soltimeadj($TimeOfDay,$STAdj);          " & VbCrLf & "            $alt[$i]= &defalt($lat, $SolTimeAdj, $SolDec);" & VbCrLf & "            $azi[$i]= &defazi($lat, $SolTimeAdj, $SolDec);" & VbCrLf & "            " & VbCrLf & "            #~ $DirH[$i] = &minimum($line[13]-$line[15],sin($alt[$i]*$PI/180)*$line[14]);" & VbCrLf & "            #~ $DirH[$i] = sin($alt[$i]*$PI/180)*$line[14];" & VbCrLf & "            $DirH[$i] = ($line[13]-$line[15]);" & VbCrLf & "            #~ $DirH[$i] = sin($alt[$i]*$PI/180)*1000;" & VbCrLf & "            $DirH[$i] = int($DirH[$i]);" & VbCrLf & "            $DifH[$i] = $line[15];" & VbCrLf & "            $SkyC[$i] = $line[22];" & VbCrLf & "            " & VbCrLf & "            $switch[$i] = &cloudlevel($line[22]); " & VbCrLf & "            " & VbCrLf & "            $intalt[$i] = int($alt[$i]/$alt_segment)*$alt_segment+$alt_segment/2;" & VbCrLf & "            $intazi[$i] = int($azi[$i]/$azi_segment)*$azi_segment+$azi_segment/2;" & VbCrLf & "            " & VbCrLf & "            #~ $myline[$i] = ""!gensky -ang $alt[$i] $azi[$i] $switch[$i] -R $DirH[$i] -B $DifH[$i]""; " & VbCrLf & "            $myline[$i] = ""!gensky -ang $alt[$i] $azi[$i] -R $DirH[$i] -B $DifH[$i]"";" & VbCrLf & "            #~ $myline[$i] = ""gensky -ang $alt[$i] $azi[$i] +s -R $DirH[$i] -B $DifH[$i]""; " & VbCrLf & "            $i++;" & VbCrLf & "        }" & VbCrLf & "        " & VbCrLf & "    }" & VbCrLf & "    " & VbCrLf & "}" & VbCrLf & "$M = $i-1;" & VbCrLf & "#~ Re-create sky!" & VbCrLf & "#~ Accummilate intalt and intazi to create a patched sky definition    " & VbCrLf & "$maxalt = 0;" & VbCrLf & "$maxazi = 0;" & VbCrLf & "$minalt = 90;" & VbCrLf & "$minazi = 180;" & VbCrLf & "foreach $o(@alt){" & VbCrLf & "    $maxalt = &maximum($o,$maxalt);" & VbCrLf & "    $minalt = &minimum($o,$minalt);" & VbCrLf & "}" & VbCrLf & "foreach $o(@azi){" & VbCrLf & "    #~ if ($o =~ m/\D/) {print ""hello\n"";}" & VbCrLf & "    $maxazi = &maximum($o,$maxazi);" & VbCrLf & "    $minazi =&minimum($o,$minazi);" & VbCrLf & "}" & VbCrLf & "print ""Min Altitude: $minalt Max Altitude: $maxalt\n"";" & VbCrLf & "print ""Min Azimuth: $minazi Max Azimuth: $maxazi\n"";" & VbCrLf & "print ""Latitude: $lat Longitude: $lon Meridian: $mer\n"";" & VbCrLf & "$t = 0;" & VbCrLf & "$minpatchazi = int($minazi/$azi_segment)*$azi_segment;" & VbCrLf & "$minpatchalt = int($minalt/$alt_segment)*$alt_segment;" & VbCrLf & "#~ patches" & VbCrLf & "for $i(0..int(($maxalt-$minalt)/$alt_segment)){" & VbCrLf & "    for $j(0..int(($maxazi-$minazi)/$azi_segment)){" & VbCrLf & "        for $k(0..$M){" & VbCrLf & "            if(($minpatchalt+$alt_segment*($i+0.5) == $intalt[$k])and($minpatchazi+$azi_segment*($j+0.5) == $intazi[$k])){" & VbCrLf & "                $sumalt[$t] = $intalt[$k];" & VbCrLf & "                $sumazi[$t] = $intazi[$k];" & VbCrLf & "                $sumdirh[$t]+= $DirH[$k];  " & VbCrLf & "                $sumdifh[$t] += $DifH[$k];" & VbCrLf & "                $sumSunH[$t] += (1-$SkyC[$k]/10);" & VbCrLf & "                $totaldifh += $DifH[$k]; #~ for sum of diffuser component" & VbCrLf & "            }" & VbCrLf & "        }$t++;" & VbCrLf & "    }" & VbCrLf & "}" & VbCrLf & "" & VbCrLf & "" & VbCrLf & "#~ write to files" & VbCrLf & "open my $ALLSUNS,"">allsuns.sky"";" & VbCrLf & "open my $PATCH,"">patchedsuns.sky"";" & VbCrLf & "open my $SUNHOURS,"">sunhours.sky"";" & VbCrLf & "" & VbCrLf & "foreach $line(@myline){" & VbCrLf & "    print $ALLSUNS ""$line\n"";" & VbCrLf & "}" & VbCrLf & "for $i(0..$t-1){" & VbCrLf & "    print $PATCH ""!gensky -ang $sumalt[$i] $sumazi[$i] -R $sumdirh[$i] -B $sumdifh[$i]\n"" if defined $sumdirh[$i];" & VbCrLf & "    print $SUNHOURS ""!gensky -ang $sumalt[$i] $sumazi[$i] -R $sumSunH[$i] -B 0\n"" if defined $sumSunH[$i];" & VbCrLf & "}" & VbCrLf & "" & VbCrLf & "print $PATCH ""!gensky -ang 90 0 -R 0 -B $totaldifh\n"";  #~ override the diffuse component, angle 60 60 is arbitrary " & VbCrLf & "print $ALLSUNS ""!gensky -ang 90 0 -R 0 -B $totaldifh\n"";  #~ override the diffuse component, angle 60 60 is arbitrary " & VbCrLf & "" & VbCrLf & "" & VbCrLf & "Hemisky($ALLSUNS);" & VbCrLf & "Hemisky($PATCH);" & VbCrLf & "" & VbCrLf & "close $PATCH;close $SUNHOURS;close $ALLSUNS;" & VbCrLf & "" & VbCrLf & "" & VbCrLf & "sub Hemisky{" & VbCrLf & " my $fh = shift;" & VbCrLf & "  print $fh ""skyfunc glow skyglow\n"";" & VbCrLf & "  print $fh ""0\n"";" & VbCrLf & "  print $fh ""0\n"";" & VbCrLf & "  print $fh ""4 1 1 1 0\n\n"";" & VbCrLf & "" & VbCrLf & "  print $fh ""skyglow source sky\n"";" & VbCrLf & "  print $fh ""0\n"";" & VbCrLf & "  print $fh ""0\n"";" & VbCrLf & "  print $fh ""4 0 0 1 180\n""; " & VbCrLf & "}"
+		Case "mergefile"
+			strLine = "($file1,$file2)=@ARGV;" & VbCrLf & "" & VbCrLf & "open(F1,$file1) or die""XX"";" & VbCrLf & "open(F2,$file2) or die""XX"";" & VbCrLf & "" & VbCrLf & "($name,$temp1)= split(/\./,$file1);" & VbCrLf & "$outfile=join ("""",""$name"",""_output.vtk"");" & VbCrLf & "" & VbCrLf & "open(F3,"">$outfile"") or die""XX"";" & VbCrLf & "" & VbCrLf & "while (<F1>) {" & VbCrLf & "$line=$_;" & VbCrLf & "print F3 ""$line"";" & VbCrLf & "};" & VbCrLf & "" & VbCrLf & "while (<F2>) {" & VbCrLf & "$line=$_;" & VbCrLf & "print F3 ""$line"";" & VbCrLf & "};" & VbCrLf & "" & VbCrLf & "close F1;" & VbCrLf & "close F2;" & VbCrLf & "close F3;"
+		Case "vtk2result"
+			strLine = "($threshold,$inputfile,$outfile)=@ARGV;" & VbCrLf & "#$inputfile=$ARGV[0];" & VbCrLf & "" & VbCrLf & "if (scalar(@ARGV) == 3) {" & VbCrLf & "    ($name,$temp1)= split(/\./,$inputfile);" & VbCrLf & "    #$outfile=join ("""",""$name"",""_area.dat"");" & VbCrLf & "" & VbCrLf & "    #$outfile=""irradiance.dat"";" & VbCrLf & "    $lines=0;" & VbCrLf & "    open (IN,""<$outfile"");" & VbCrLf & "    while(<IN>){" & VbCrLf & "            chomp;s/\""//g;" & VbCrLf & "            $myline=$_;" & VbCrLf & "            $filelines[$lines]=$_;" & VbCrLf & "            $lines++;" & VbCrLf & "        }" & VbCrLf & "    close IN;" & VbCrLf & "    open (OUT,"">$outfile"");" & VbCrLf & "    for $i(0..$lines-1){" & VbCrLf & "        print OUT ""$filelines[$i]\n"";" & VbCrLf & "    }" & VbCrLf & "" & VbCrLf & "    # Open files to write to" & VbCrLf & "    open (IN,""<$inputfile"");" & VbCrLf & "    #$threshold=270;" & VbCrLf & "    $flag_point=0;" & VbCrLf & "    $flag_element=0;" & VbCrLf & "    $flag_value=0;" & VbCrLf & "    $sumarea=0;" & VbCrLf & "    $totalvalue=0;" & VbCrLf & "    $Tarea=0;" & VbCrLf & "    $p=0;" & VbCrLf & "    $c=0;" & VbCrLf & "    $fc=0;" & VbCrLf & "    $v=0;" & VbCrLf & "    # Look through input file line by line" & VbCrLf & "    while(<IN>){" & VbCrLf & "            chomp;s/\""//g;" & VbCrLf & "            $myline=$_;" & VbCrLf & "            " & VbCrLf & "            # read value data" & VbCrLf & "            if ($flag_value){" & VbCrLf & "                    @value[$v]=$_;" & VbCrLf & "                    $v=$v+1;" & VbCrLf & "                }" & VbCrLf & "            # start reading value data when reach ""LOOKUP_TABLE""" & VbCrLf & "            if(/LOOKUP_TABLE/){" & VbCrLf & "                $flag_value=1;" & VbCrLf & "            }" & VbCrLf & "            # stop reading connectivity data when reach ""POINT_DATA""" & VbCrLf & "            if(/POINT_DATA/){" & VbCrLf & "                $flag_element=0;" & VbCrLf & "            }" & VbCrLf & "" & VbCrLf & "            # read connectivity data" & VbCrLf & "            if ($flag_element){" & VbCrLf & "                    @connectivity_line[$c]=$_;" & VbCrLf & "                    $c=$c+1;" & VbCrLf & "                    #(@connectivity)=split /\s+/, $_;" & VbCrLf & "                    #print OUT ""@connectivity\n""if defined @connectivity;" & VbCrLf & "                }" & VbCrLf & "            # stop reading point data when reach ""POLYGONS""" & VbCrLf & "            if(/POLYGONS/){" & VbCrLf & "                $flag_point=0;" & VbCrLf & "                $flag_element=1;" & VbCrLf & "                ($temp1,$N_element,$temp2)= split /\s+/, $_;   " & VbCrLf & "            }" & VbCrLf & "            " & VbCrLf & "             # read point data       " & VbCrLf & "            if ($flag_point){" & VbCrLf & "                    @point_line[$p]=$_;" & VbCrLf & "                    $p=$p+1;" & VbCrLf & "                    #(@pointloc)=split /\s+/, $_;" & VbCrLf & "                    #print OUT ""$pointloc[0] $pointloc[1] $pointloc[2]\n""if defined @pointloc;" & VbCrLf & "            }" & VbCrLf & "            # start reading point data when reach ""POINTS""" & VbCrLf & "            if (/POINTS/){" & VbCrLf & "                ($temp1,$N_point,$temp2)= split /\s+/, $_;" & VbCrLf & "                $flag_point=1;" & VbCrLf & "            }" & VbCrLf & "                " & VbCrLf & "    }" & VbCrLf & "" & VbCrLf & "    #change 4 side element to 3 side" & VbCrLf & "    for $i(0..$N_element-1){" & VbCrLf & "        ($Nside,$con1,$con2,$con3,$con4)=split(' ',$connectivity_line[$i]);" & VbCrLf & "        if ($Nside==4){" & VbCrLf & "            $final_connectivity[$fc]=join("" "",$con1+1,$con2+1,$con3+1);" & VbCrLf & "            $fc++;" & VbCrLf & "            $final_connectivity[$fc]=join("" "",$con3+1,$con4+1,$con1+1);" & VbCrLf & "            $fc++;" & VbCrLf & "        }else{" & VbCrLf & "            $final_connectivity[$fc]=join("" "",$con1+1,$con2+1,$con3+1);" & VbCrLf & "            $fc++;" & VbCrLf & "        } " & VbCrLf & "    }" & VbCrLf & "    $E_out=$fc-1;" & VbCrLf & "" & VbCrLf & "    #read point data" & VbCrLf & "    for $i(0..$N_point-1){" & VbCrLf & "        ($px[$i],$py[$i],$pz[$i])= split /\s+/, $point_line[$i] if defined $point_line[$i];" & VbCrLf & "    }" & VbCrLf & "" & VbCrLf & "    #dump out connectivity data" & VbCrLf & "    for $j(0..$fc-1){" & VbCrLf & "        ($con1,$con2,$con3)=split(' ',$final_connectivity[$j]);" & VbCrLf & "        $x1=$px[$con2-1]-$px[$con1-1];" & VbCrLf & "        $x2=$px[$con3-1]-$px[$con1-1];" & VbCrLf & "        $y1=$py[$con2-1]-$py[$con1-1];" & VbCrLf & "        $y2=$py[$con3-1]-$py[$con1-1];" & VbCrLf & "        $z1=$pz[$con2-1]-$pz[$con1-1];" & VbCrLf & "        $z2=$pz[$con3-1]-$pz[$con1-1]; " & VbCrLf & "        $xc=($px[$con1-1]+$px[$con2-1]+$px[$con3-1])/3.0;" & VbCrLf & "        $yc=($py[$con1-1]+$py[$con2-1]+$py[$con3-1])/3.0;" & VbCrLf & "        $zc=($pz[$con1-1]+$pz[$con2-1]+$pz[$con3-1])/3.0;" & VbCrLf & "        $a=$y1*$z2-$y2*$z1;" & VbCrLf & "        $b=$x2*$z1-$x1*$z2;" & VbCrLf & "        $c=$x1*$y2-$y1*$x2;" & VbCrLf & "        $area=sqrt($a*$a+$b*$b+$c*$c)*0.5;" & VbCrLf & "        $d1=1.0/sqrt(($xc-$px[$con1-1])*($xc-$px[$con1-1])+($yc-$py[$con1-1])*($yc-$py[$con1-1])+($zc-$pz[$con1-1])*($zc-$pz[$con1-1]));" & VbCrLf & "        $d2=1.0/sqrt(($xc-$px[$con2-1])*($xc-$px[$con2-1])+($yc-$py[$con2-1])*($yc-$py[$con2-1])+($zc-$pz[$con2-1])*($zc-$pz[$con2-1]));" & VbCrLf & "        $d3=1.0/sqrt(($xc-$px[$con3-1])*($xc-$px[$con3-1])+($yc-$py[$con3-1])*($yc-$py[$con3-1])+($zc-$pz[$con3-1])*($zc-$pz[$con3-1]));" & VbCrLf & "        $cvalue=($value[$con1-1]*$d1+$value[$con2-1]*$d2+$value[$con3-1]*$d3)/($d1+$d2+$d3);" & VbCrLf & "        #print OUT ""$area\n"" if defined $final_connectivity[$j];" & VbCrLf & "        $sumarea=$sumarea+$area;" & VbCrLf & "        $totalvalue=$totalvalue+$cvalue*$area;" & VbCrLf & "        if ($cvalue >= $threshold) {" & VbCrLf & "            $Tarea=$Tarea+$area;" & VbCrLf & "        }" & VbCrLf & "    }" & VbCrLf & "" & VbCrLf & "    $temp = $Tarea/$sumarea*100.0;" & VbCrLf & "" & VbCrLf & "" & VbCrLf & "    #print ""Parts: $name\n"";" & VbCrLf & "    #print ""  Total Area = $sumarea\n"";" & VbCrLf & "    #print ""  Integral value = $totalvalue\n"";" & VbCrLf & "    #print ""  % of area over threshold = $temp"";" & VbCrLf & "    #print ""Total Area = $sumarea\n"";" & VbCrLf & "    #print ""Total Irradiance = $totalvalue\n"";" & VbCrLf & "    ($tempname,$temp2) = split(/_output/,$name);" & VbCrLf & "    #print OUT ""$temp\t$sumarea\t$totalvalue\n"";" & VbCrLf & "    if ($threshold == 0) {" & VbCrLf & "        print OUT ""$tempname\t$sumarea\t$totalvalue\n"";" & VbCrLf & "        print ""Layer Name, Total Area, Total Value, writen to $outfile\n"";" & VbCrLf & "    } else {" & VbCrLf & "        print OUT ""$tempname\t$sumarea\t$Tarea\n"";" & VbCrLf & "        print ""Layer Name, Total Area, Area over threshold, writen to $outfile\n"";" & VbCrLf & "    }" & VbCrLf & "" & VbCrLf & "    close IN;" & VbCrLf & "    close OUT;" & VbCrLf & "} else {" & VbCrLf & "    print ""Usage: perl vtk2result.pl Threshold InputFile OutputFile\n"";" & VbCrLf & "}"
+		Case "makeRadplane"
+			strLine = "# The input obj file must be specified in the call i.e." & VbCrLf & "# perl makeRadplane.pl < filename.obj" & VbCrLf & "" & VbCrLf & "# Versions" & VbCrLf & "# Written Nov 07" & VbCrLf & "# Rev 08_05_01" & VbCrLf & "# The Header to the Scalar field is added automatically. The user may want to edit the name of the field, which is currently Irradiance. To include spaces use the % code (I'm not sure exactly what it is)." & VbCrLf & "# The bug which caused data to be missed if it exceeded one line has been fixed." & VbCrLf & "" & VbCrLf & "" & VbCrLf & "" & VbCrLf & "# Open files to write to" & VbCrLf & "" & VbCrLf & "open (OUT1,"">RadPlane.dat"");" & VbCrLf & "open (OUT2,"">VTKPlane.vtk"");" & VbCrLf & "" & VbCrLf & "# Look through input file line by line" & VbCrLf & "" & VbCrLf & "while (<STDIN>){" & VbCrLf & "    chomp; $myline=$_;" & VbCrLf & "    " & VbCrLf & "    # If the line starts with a space it will be the last part of the previous face connectivity data. The previous line is replaced to include this extra information." & VbCrLf & "    " & VbCrLf & "        if ($myline =~ m/^ /){" & VbCrLf & "        @arrNewLine=split(/\//,$myline);" & VbCrLf & "        $arrNewLine[0]=$arrNewLine[0]-1;" & VbCrLf & "        $lineoutF[$f-1] = ""4 $arrPt1[0] $arrPt2[0] $arrPt3[0] $arrNewLine[0]"";" & VbCrLf & "        $count++;" & VbCrLf & "    }" & VbCrLf & "    " & VbCrLf & "    # If line is vertex data split the data up and store it in lineoutV suitable for vtk format" & VbCrLf & "    " & VbCrLf & "    if ($myline =~ m/^v /){" & VbCrLf & "        @arrVertex=split(/\s+/,$myline);" & VbCrLf & "        $lineoutV[$i] = ""$arrVertex[1] $arrVertex[2] $arrVertex[3]"";" & VbCrLf & "        $i++;" & VbCrLf & "    }" & VbCrLf & "    " & VbCrLf & "    # If line is normal data ..." & VbCrLf & "    " & VbCrLf & "    if ($myline =~ m/^vn /){" & VbCrLf & "        @arrNormal=split(/\s+/,$myline);" & VbCrLf & "        $lineoutVn[$j] = ""$arrNormal[1] $arrNormal[2] $arrNormal[3]"";" & VbCrLf & "        $j++;" & VbCrLf & "    }" & VbCrLf & "    " & VbCrLf & "    # If line is face connectivity data ..." & VbCrLf & "    " & VbCrLf & "    if ($myline =~ m/^f /){" & VbCrLf & "        @arrFace=split(/\s+/,$myline);" & VbCrLf & "        @arrPt1 = split(/\//,$arrFace[1]);" & VbCrLf & "        $arrPt1[0] = $arrPt1[0]-1;                              # CH? Why do these strings have indices?" & VbCrLf & "        @arrPt2 = split(/\//,$arrFace[2]);" & VbCrLf & "        $arrPt2[0] = $arrPt2[0]-1;" & VbCrLf & "        @arrPt3 = split(/\//,$arrFace[3]);" & VbCrLf & "        $arrPt3[0] = $arrPt3[0]-1;" & VbCrLf & "        " & VbCrLf & "        # If there is a fourth vertex associated with this face also add this vertex data" & VbCrLf & "        " & VbCrLf & "        if ($arrFace[4] != """") { # look at it again!!!" & VbCrLf & "            @arrPt4 = split(/\//,$arrFace[4]);" & VbCrLf & "            $arrPt4[0] = $arrPt4[0]-1;" & VbCrLf & "            $lineoutF[$f] = ""4 $arrPt1[0] $arrPt2[0] $arrPt3[0] $arrPt4[0]"";          # CH? Does $f need To be initialised Or does it start at 0?" & VbCrLf & "            $count = $count +5;                 # " & VbCrLf & "        }else{$lineoutF[$f] = ""3 $arrPt1[0] $arrPt2[0] $arrPt3[0]"";$count = $count+4;} " & VbCrLf & "        $f++;" & VbCrLf & "    }" & VbCrLf & "    " & VbCrLf & "    # $count counts the number of entries In the required In the polygon part of the vtk file (4 For a triangle And 5 For a square)" & VbCrLf & "    # $f counts the number of faces." & VbCrLf & "    # These two values are required For vtk file." & VbCrLf & "}" & VbCrLf & "" & VbCrLf & "# Output the data In the right format into the vtk file And into the dat file" & VbCrLf & "" & VbCrLf & "print OUT2 ""# vtk DataFile Version 2.0\n"";" & VbCrLf & "print OUT2 ""My Test Plane\n"";" & VbCrLf & "print OUT2 ""ASCII\n"";" & VbCrLf & "print OUT2 ""DATASET POLYDATA\n"";" & VbCrLf & "print OUT2 ""POINTS $j float\n"";" & VbCrLf & "for $i(0..$j-1){" & VbCrLf & "    print OUT1 ""$lineoutV[$i] $lineoutVn[$i]\n"";" & VbCrLf & "    print OUT2 ""$lineoutV[$i]\n"";" & VbCrLf & "}" & VbCrLf & "print OUT2 ""POLYGONS $f $count\n"";" & VbCrLf & "for $i(0..$f-1){" & VbCrLf & "    print OUT2 ""$lineoutF[$i]\n"";" & VbCrLf & "}" & VbCrLf & "" & VbCrLf & "print OUT2 ""POINT_DATA $j\n"";" & VbCrLf & "print OUT2 ""SCALARS Irradiance float\n"";" & VbCrLf & "print OUT2 ""LOOKUP_TABLE Default\n"";"
+		Case "vtk2tecplot"
+			strLine = "$inputfile=$ARGV[0];" & VbCrLf & "" & VbCrLf & "($name,$temp1)= split(/\./,$inputfile);" & VbCrLf & "$outfile=join ("""",""$name"","".dat"");" & VbCrLf & "" & VbCrLf & "# Open files To write To" & VbCrLf & "" & VbCrLf & "open (IN,""<$inputfile"");" & VbCrLf & "open (OUT,"">$outfile"");" & VbCrLf & "$flag_point=0;" & VbCrLf & "$flag_element=0;" & VbCrLf & "$flag_value=0;" & VbCrLf & "$p=0;" & VbCrLf & "$c=0;" & VbCrLf & "$fc=0;" & VbCrLf & "$v=0;" & VbCrLf & "# Look through input file line by line" & VbCrLf & "while(<IN>){" & VbCrLf & "        chomp;s/\""//g;" & VbCrLf & "        $myline=$_;" & VbCrLf & "        " & VbCrLf & "        # read value data" & VbCrLf & "        if ($flag_value){" & VbCrLf & "                @value[$v]=$_;" & VbCrLf & "                $v=$v+1;" & VbCrLf & "            }" & VbCrLf & "        # start reading value data when reach ""LOOKUP_TABLE""" & VbCrLf & "        if(/LOOKUP_TABLE/){" & VbCrLf & "            $flag_value=1;" & VbCrLf & "        }" & VbCrLf & "        # Stop reading connectivity data when reach ""POINT_DATA""" & VbCrLf & "        if(/POINT_DATA/){" & VbCrLf & "            $flag_element=0;" & VbCrLf & "        }" & VbCrLf & "" & VbCrLf & "        # read connectivity data" & VbCrLf & "        if ($flag_element){" & VbCrLf & "                @connectivity_line[$c]=$_;" & VbCrLf & "                $c=$c+1;" & VbCrLf & "                #(@connectivity)=split /\s+/, $_;" & VbCrLf & "                #print OUT ""@connectivity\n""If defined @connectivity;" & VbCrLf & "            }" & VbCrLf & "        # Stop reading point data when reach ""POLYGONS""" & VbCrLf & "        if(/POLYGONS/){" & VbCrLf & "            $flag_point=0;" & VbCrLf & "            $flag_element=1;" & VbCrLf & "            ($temp1,$N_element,$temp2)= split /\s+/, $_;   " & VbCrLf & "        }" & VbCrLf & "        " & VbCrLf & "         # read point data       " & VbCrLf & "        if ($flag_point){" & VbCrLf & "                @point_line[$p]=$_;" & VbCrLf & "                $p=$p+1;" & VbCrLf & "                #(@pointloc)=split /\s+/, $_;" & VbCrLf & "                #print OUT ""$pointloc[0] $pointloc[1] $pointloc[2]\n""If defined @pointloc;" & VbCrLf & "        }" & VbCrLf & "        # start reading point data when reach ""POINTS""" & VbCrLf & "        if (/POINTS/){" & VbCrLf & "            ($temp1,$N_point,$temp2)= split /\s+/, $_;" & VbCrLf & "            $flag_point=1;" & VbCrLf & "        }" & VbCrLf & "            " & VbCrLf & "}" & VbCrLf & "" & VbCrLf & "#change 4 side element To 3 side" & VbCrLf & "for $i(0..$N_element-1){" & VbCrLf & "    ($Nside,$con1,$con2,$con3,$con4)=split(' ',$connectivity_line[$i]);" & VbCrLf & "    if ($Nside==4){" & VbCrLf & "        $final_connectivity[$fc]=join("" "",$con1+1,$con2+1,$con3+1);" & VbCrLf & "        $fc++;" & VbCrLf & "        $final_connectivity[$fc]=join("" "",$con3+1,$con4+1,$con1+1);" & VbCrLf & "        $fc++;" & VbCrLf & "    }else{" & VbCrLf & "        $final_connectivity[$fc]=join("" "",$con1+1,$con2+1,$con3+1);" & VbCrLf & "        $fc++;" & VbCrLf & "    }" & VbCrLf & "}" & VbCrLf & "$E_out=$fc;" & VbCrLf & "#write header" & VbCrLf & "print OUT ""TITLE=\""Output\""\n"";" & VbCrLf & "print OUT ""VARIABLES=\""X\"",\""Y\"",\""Z\"",\""Irradiance\""\n"";" & VbCrLf & "print OUT ""ZONE T=\""Irradiance\"",N=$p,E=$E_out,ET=TRIANGLE,F=FEPOINT\n"";" & VbCrLf & "" & VbCrLf & "#dump out point data" & VbCrLf & "for $i(0..$N_point){" & VbCrLf & "    print OUT ""$point_line[$i] $value[$i]\n""if defined $point_line[$i];" & VbCrLf & "}" & VbCrLf & "#dump out connectivity data" & VbCrLf & "for $j(0..$fc){" & VbCrLf & "    print OUT ""$final_connectivity[$j]\n""if defined $final_connectivity[$j];" & VbCrLf & "}" & VbCrLf & "close IN;" & VbCrLf & "close OUT;"
+		Case "objchecker"
+			strLine = "# The input obj file must be specified in the call i.e." & VbCrLf & "# perl makeRadplane.pl < filename.obj" & VbCrLf & "" & VbCrLf & "# Versions" & VbCrLf & "# Written Nov 07" & VbCrLf & "# Rev 08_05_01" & VbCrLf & "# The Header to the Scalar field is added automatically. The user may want to edit the name of the field, which is currently Irradiance. To include spaces use the % code (I'm not sure exactly what it is)." & VbCrLf & "# The bug which caused data to be missed if it exceeded one line has been fixed." & VbCrLf & "" & VbCrLf & "$boolChange = 0;" & VbCrLf & "" & VbCrLf & "# Open files to write to" & VbCrLf & "($inputfile)=@ARGV;" & VbCrLf & "if (scalar(@ARGV) == 1){" & VbCrLf & "    open (IN, ""<$inputfile"");" & VbCrLf & "    " & VbCrLf & "    $found=0;" & VbCrLf & "    $foundvn=0;" & VbCrLf & "    $foundf=0;" & VbCrLf & "    $error=0;" & VbCrLf & "    # Look through input file line by line" & VbCrLf & "" & VbCrLf & "    while (<IN>){" & VbCrLf & "        chomp; $myline=$_;" & VbCrLf & "        " & VbCrLf & "    if ($foundvn){" & VbCrLf & "            $lineout[$j-1] = ""$templine[0] $templine[1] $templine[2] $myline"";" & VbCrLf & "            $foundvn=0;" & VbCrLf & "            $boolChange = 1;" & VbCrLf & "    }elsif($foundf){" & VbCrLf & "            $lineout[$j-1] = ""$templine[0] $templine[1] $templine[2] $templine[3] $myline"";" & VbCrLf & "            $foundf=0;" & VbCrLf & "            $boolChange = 1;" & VbCrLf & "        }else{" & VbCrLf & "            if ($myline=~ /\\/){" & VbCrLf & "                $error=1;" & VbCrLf & "                if ($myline =~ m/^vn /){" & VbCrLf & "                    @templine=split(/\s+/,$myline);" & VbCrLf & "                    $lineout[$j] = ""$templine[0] $templine[1] $templine[2] templine[3]"";" & VbCrLf & "                    $foundvn=1;" & VbCrLf & "                    $error=0;" & VbCrLf & "                }" & VbCrLf & "                " & VbCrLf & "                if ($myline =~ m/^f /){" & VbCrLf & "                    @templine=split(/\s+/,$myline);" & VbCrLf & "                    $lineout[$j] = ""$templine[0] $templine[1] $templine[2] templine[3] templine[4]"";" & VbCrLf & "                    $foundf=1;" & VbCrLf & "                    $error=0;" & VbCrLf & "                }" & VbCrLf & "                if ($error){" & VbCrLf & "                    print ""error"";" & VbCrLf & "                    $error=0;" & VbCrLf & "                }" & VbCrLf & "            $found=1;" & VbCrLf & "            }" & VbCrLf & "        $lineout[$j]=$myline;" & VbCrLf & "        if ($myline =~ m/^vn 0 0 0/){" & VbCrLf & "            $lineout[$j] = ""vn 0 0 1"";" & VbCrLf & "            $boolChange = 1;" & VbCrLf & "        }" & VbCrLf & "        $j++;" & VbCrLf & "        }" & VbCrLf & "    }" & VbCrLf & "    close IN;" & VbCrLf & "" & VbCrLf & "    # Output the data in the right format into the vtk file and into the dat file" & VbCrLf & "" & VbCrLf & "    if ($boolChange==1){" & VbCrLf & "        open (OUT,"">temp.tmp"");" & VbCrLf & "        for $i(0..$j-1){" & VbCrLf & "            print OUT ""$lineout[$i]\n"";" & VbCrLf & "        }" & VbCrLf & "        close OUT;" & VbCrLf & "        @tempfilename=split(/.obj/,$inputfile);" & VbCrLf & "        $backupfile = ""$tempfilename[0].bak"";" & VbCrLf & "        unlink($backupfile);" & VbCrLf & "        rename($inputfile,$backupfile);" & VbCrLf & "        rename(""temp.tmp"",$inputfile);" & VbCrLf & "    }" & VbCrLf & "    " & VbCrLf & "} else{" & VbCrLf & "    print ""Usage: perl objchecker.pl ObjFile\n"";" & VbCrLf & "}"
+		Case Else
+			Exit Sub
+	End Select
+	strFilePath = strPath & strPerl & ".pl"
+	Set objFSO = CreateObject("Scripting.FileSystemObject")
+	Set objStream = objFSO.CreateTextFile(strFilePath, True)
+	objStream.WriteLine strLine
+	objStream.Close
+	Set objFSO = Nothing
+End Sub

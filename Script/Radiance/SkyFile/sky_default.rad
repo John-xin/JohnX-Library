@@ -1,0 +1,18 @@
+!gensky 9 22 12:0 +s -a 31.12 -o -121.30 -m -120.00 -t 2.00 | xform -rz 0.00
+# Outside Paramaters.
+skyfunc glow sky_glow
+0
+0
+4 .986 .986 1.2020135 0
+sky_glow source sky
+0
+0
+4 0 0 1 180
+skyfunc glow ground_glow
+0
+0
+4 1 .7 .25 0
+ground_glow source ground
+0
+0
+4 0 0 -1 180

@@ -1,0 +1,31 @@
+!gensky -ang 20.5 99.5 -R 71 -B 132
+!gensky -ang 23.3 98.5 -R 100.6 -B 145.2
+!gensky -ang 26.1 97.5 -R 130.2 -B 158.4
+!gensky -ang 28.9 96.5 -R 159.8 -B 171.6
+!gensky -ang 31.7 95.5 -R 189.4 -B 184.8
+!gensky -ang 34.5 94.5 -R 219 -B 198
+!gensky -ang 37.3 93.3 -R 241 -B 209.2
+!gensky -ang 40.1 92.1 -R 263 -B 220.4
+!gensky -ang 42.9 90.9 -R 285 -B 231.6
+!gensky -ang 45.7 89.7 -R 307 -B 242.8
+!gensky -ang 48.5 88.5 -R 329 -B 254
+!gensky -ang 51.1 86.9 -R 369.8 -B 251
+!gensky -ang 53.7 85.3 -R 410.6 -B 248
+!gensky -ang 56.3 83.7 -R 451.4 -B 245
+!gensky -ang 58.9 82.1 -R 492.2 -B 242
+!gensky -ang 61.5 80.5 -R 533 -B 239
+!gensky -ang 64.1 77.1 -R 554.6 -B 238.6
+!gensky -ang 66.7 73.7 -R 576.2 -B 238.2
+!gensky -ang 69.3 70.3 -R 597.8 -B 237.8
+!gensky -ang 71.9 66.9 -R 619.4 -B 237.4
+!gensky -ang 74.5 63.5 -R 641 -B 237
+!gensky -ang 90 0 -R 0 -B 4562
+skyfunc glow skyglow
+0
+0
+4 1 1 1 0
+
+skyglow source sky
+0
+0
+4 0 0 1 180

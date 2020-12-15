@@ -1,0 +1,18 @@
+1. interactive meshing process
+	- can mesh an edge
+	- can add points on the edge by user
+	- can save the parameters set on the edge
+	- can apply the saved parameter to other edge
+
+2. integrated working environment
+	- can manipulate geometry model
+	- can manipulate mesh
+	- can setup CFD boundary condition
+	- can add testpoints
+	- can apply saved testpoints to other CFD cases
+	- can postprocessing testpoints
+
+3. post-processing
+	- can add a value on the legend to distinguish the color at the value strongly
+
+	

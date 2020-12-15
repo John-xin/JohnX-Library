@@ -1,0 +1,42 @@
+Option Explicit
+'Script written by <insert name>
+'Script copyrighted by <insert company name>
+'Script version 2018年5月30日 16:53:38
+
+Call Main()
+Sub Main()
+	Dim objStrArr, cpObjStr
+	Dim layerStrArr, layerStateArr, newLayerStr
+	Dim numOfFloor, floorHeight, distance
+	Dim tmp
+	Dim i, j
+	
+	'get needed rhino layer names
+	layerStrArr = rhino.LayerNames
+	ReDim layerStateArr(UBound(layerStrArr))
+	For i =0 To UBound(layerStrArr)
+		layerStateArr(i) = False
+	Next
+	layerStateArr = rhino.CheckListBox(layerStrArr, layerStateArr, "select layer where copying object by floor level")
+	
+	'copy object by floor level and change to new layer
+	numOfFloor = rhino.RealBox("Input Number of Floor", 2)
+	floorHeight = rhino.RealBox("Input Floor Height", 2.8)
+	For i = 0 To UBound(layerStrArr)
+		If layerStateArr(i) Then
+			distance = floorHeight
+			objStrArr = rhino.ObjectsByLayer(layerStrArr(i))
+			tmp = split(layerStrArr(i), "_")
+			
+			For j= 2 To numOfFloor
+				cpObjStr = rhino.CopyObject(objStrArr(0), Array(0, 0, 0), Array(0, 0, distance))
+				newLayerStr = tmp(0) & "_F" & j & "_" & tmp(2)
+				rhino.AddLayer(newLayerStr)
+				rhino.ObjectLayer cpObjStr, newLayerStr
+				distance = distance + floorHeight
+			Next
+		End If
+	Next
+	
+	
+End Sub

@@ -1,0 +1,7 @@
+Boussinasq model
+Air Density 1.225
+Thermal expansion coefficient of air 0.0034/K @ 25 deg C
+
+Operation conditon
+z -1
+operation temperature - minimum T

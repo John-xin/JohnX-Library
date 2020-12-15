@@ -1,0 +1,17 @@
+Sub export2obj()
+MyLayerNames=Rhino.LayerNames
+for each MyLayer in MyLayerNames
+    rhino.command("_SelNone")
+    If Rhino.IsLayerOn(MyLayer) Then
+        arrObjects = Rhino.ObjectsByLayer(MyLayer, vbTrue)
+        if isarray(arrObjects) then
+            for each MyObject in arrObjects
+                Rhino.SelectObject MyObject
+            next
+            rhino.command("_Join")
+        else
+            Rhino.SelectObject arrObjects
+        end if
+    end if 
+next
+end sub
