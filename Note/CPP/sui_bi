@@ -3,3 +3,7 @@ software
     files - source files, header files
       header - abstract funcs, vars, classes - prototype/interfaces
       source - interfaces implementation ()
+
+use relative path / directory
+./etc/file.txt or .\\etc\\file.txt
+../folder/etc/file.txt
