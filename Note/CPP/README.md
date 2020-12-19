@@ -29,3 +29,19 @@ int a
 func1(a)
 func2(&a)
 
+##Ways of initializing an object
+```
+class Entity {
+public:
+    int x, y;
+    
+    Entity() : x(0), y(0) { }
+    Entity(int x, int y) : x(x), y(y) { }
+}
+
+Entity ent1;                //Uses the default constructor, so x=0 and y=0
+Entity ent2();              //Uses the default constructor, so x=0 and y=0 (Not sure)
+Entity ent3(1, 2);          //Made constructor, so x=1 and y=2
+Entity ent4 = Entity();     //Default constructor, so x=0 and y=0
+Entity ent5 = Entity(2, 3); //Made constructor, so x=2 and y=3
+```
