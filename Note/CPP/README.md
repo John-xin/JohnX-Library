@@ -29,7 +29,7 @@ int a
 func1(a)
 func2(&a)
 
-##Ways of initializing an object
+## Ways of initializing an object
 ```
 class Entity {
 public:
