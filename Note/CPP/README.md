@@ -45,3 +45,53 @@ Entity ent3(1, 2);          //Made constructor, so x=1 and y=2
 Entity ent4 = Entity();     //Default constructor, so x=0 and y=0
 Entity ent5 = Entity(2, 3); //Made constructor, so x=2 and y=3
 ```
+## Inheritance
+type | Same Class | Derived Class | Outer Class
+--- | --- | --- | ---
+*public* | yes | yes | yes
+*protected* | yes | yes | no
+*private* | yes | no | no
+
+```
+#include <iostream>
+#include <vector>
+#include <math.h>
+using namespace std;
+
+class BasePt {
+public:
+    int indx;
+protected:
+    double x, y, z;
+
+    BasePt(double _x, double _y, double _z) :x(_x), y(_y), z(_z)
+    {
+        indx = 0;
+        cout << "basePt\n";
+    }
+
+    void setIndx(int _indx) {
+        indx = _indx;
+    }
+
+};
+
+class FeaturePt : public BasePt {
+public:
+    FeaturePt(double _x, double _y, double _z):BasePt(_x,_y,_z)
+    {
+        cout << "FeaturePt\n";
+    }
+
+    double getDist() {
+        return sqrt(pow(x,2)+pow(y,2)+pow(z,2));
+    }
+};
+
+int main()
+{
+    FeaturePt pt(1,1,2);
+    cout << "pt distance to origin is: " << pt.getDist();
+}
+
+```
